@@ -1,0 +1,34 @@
+<div class="container">
+  <h1>Gerenciamento de Quadrinhos</h1>
+
+  <div class="actions">
+    <a routerLink="/quadrinhos/novo" class="btn-add">
+      + Adicionar Novo Quadrinho
+    </a>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Preço</th>
+        <th>Estoque</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let quad of quadrinhos">
+        <td>{{ quad.id }}</td>
+        <td>{{ quad.nome }}</td>
+        <td>{{ quad.preco | currency:'BRL' }}</td>
+        <td>{{ quad.estoque }}</td>
+        <td>
+          <a [routerLink]="['/quadrinhos/editar', quad.id]" class="btn-edit">Editar</a>
+
+          <button (click)="excluir(quad.id)" class="btn-delete">Excluir</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

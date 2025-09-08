@@ -1,0 +1,29 @@
+/* Reset básico e tema escuro inspirado em Westview/Scarlet Witch */
+:root {
+  --cor-fundo: #121212;
+  --cor-superficie: #1e1e1e;
+  --cor-primaria-vermelho: #d00000;
+  --cor-secundaria-vermelho: #9d0208;
+  --cor-magia-rosa: #ff0f7b;
+  --cor-texto-principal: #e0e0e0;
+  --cor-texto-secundario: #a0a0a0;
+  --cor-borda: #333333;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto-principal);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+h1 {
+  color: #fff;
+  font-weight: 500;
+  border-left: 5px solid var(--cor-primaria-vermelho);
+  padding-left: 15px;
+}
