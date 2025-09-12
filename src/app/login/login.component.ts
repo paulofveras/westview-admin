@@ -15,7 +15,7 @@ import { catchError, of } from 'rxjs';
 export class LoginComponent {
   form: FormGroup;
   mensagem: string = '';
-  tipoMensagem: 'sucesso' | 'erro' = 'sucesso';
+  tipoMensagem: 'sucesso' | 'erro' = 'erro';
   isLoading = false;
 
   constructor(
@@ -26,7 +26,7 @@ export class LoginComponent {
     this.form = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required],
-      perfil: ['1', Validators.required] // 1 = Funcionário, 2 = Cliente
+      perfil: ['1', Validators.required]
     });
   }
 
@@ -37,17 +37,30 @@ export class LoginComponent {
 
       this.authService.login(username, password, parseInt(perfil)).pipe(
         catchError(error => {
-          this.mostrarMensagem('Usuário ou senha inválidos', 'erro');
           this.isLoading = false;
+          console.error('Erro no login:', error);
+          if (error.status === 401 || error.status === 404) {
+            this.mostrarMensagem('Usuário ou senha inválidos', 'erro');
+          } else {
+            this.mostrarMensagem('Erro de conexão. Tente novamente.', 'erro');
+          }
           return of(null);
         })
       ).subscribe(response => {
         this.isLoading = false;
         if (response) {
-          this.mostrarMensagem('Login realizado com sucesso!');
+          console.log('Login bem-sucedido!', response);
+          this.mostrarMensagem('Login realizado com sucesso!', 'sucesso');
+          
+          // Debug: verificar se o token foi salvo
+          this.authService.debugAuth();
+          
+          // Redirecionar após breve delay
           setTimeout(() => {
             this.router.navigate(['/quadrinhos']);
           }, 1000);
+        } else {
+          this.mostrarMensagem('Erro no login. Tente novamente.', 'erro');
         }
       });
     }

@@ -1,10 +1,15 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 
 export interface AuthResponse {
-  token: string;
   usuario: any;
+}
+
+export interface AuthRequest {
+  username: string;
+  senha: string;
+  perfil: number;
 }
 
 @Injectable({
@@ -18,16 +23,34 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(username: string, password: string, perfil: number): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(this.apiUrl, {
+  login(username: string, password: string, perfil: number): Observable<HttpResponse<AuthResponse>> {
+    const authRequest: AuthRequest = {
       username,
       senha: password,
       perfil
+    };
+
+    return this.http.post<AuthResponse>(this.apiUrl, authRequest, {
+      observe: 'response' // Isso nos permite acessar os headers
     }).pipe(
       tap(response => {
-        this.setToken(response.token);
-        this.setUsuario(response.usuario);
-        this.isAuthenticatedSubject.next(true);
+        if (response && response.headers) {
+          const authHeader = response.headers.get('Authorization');
+          if (authHeader && authHeader.startsWith('Bearer ')) {
+            const token = authHeader.substring(7); // Remove 'Bearer ' do início
+            this.setToken(token);
+            
+            // Se o backend também retornar dados do usuário no body
+            if (response.body) {
+              this.setUsuario(response.body.usuario);
+            } else {
+              // Se não, criamos um objeto básico com o username
+              this.setUsuario({ username: username });
+            }
+            
+            this.isAuthenticatedSubject.next(true);
+          }
+        }
       })
     );
   }
@@ -44,6 +67,7 @@ export class AuthService {
 
   setToken(token: string): void {
     localStorage.setItem(this.tokenKey, token);
+    console.log('Token salvo:', token); // Para debug
   }
 
   setUsuario(usuario: any): void {
@@ -60,11 +84,14 @@ export class AuthService {
   }
 
   hasToken(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    return !!token;
   }
 
-  getAuthHeaders(): { [header: string]: string } {
-    const token = this.getToken();
-    return token ? { 'Authorization': `Bearer ${token}` } : {};
+  // Método para debug
+  debugAuth(): void {
+    console.log('Token:', this.getToken());
+    console.log('Usuário:', this.getUsuario());
+    console.log('Tem token?', this.hasToken());
   }
 }

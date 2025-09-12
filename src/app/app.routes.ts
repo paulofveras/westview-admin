@@ -11,10 +11,13 @@ export const routes: Routes = [
   { path: '', redirectTo: '/quadrinhos', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'cadastro', component: ClienteFormComponent },
+  
+  // Rotas protegidas
   { path: 'quadrinhos', component: QuadrinhoListComponent },
-  { path: 'quadrinhos/novo', component: QuadrinhoFormComponent },
-  { path: 'quadrinhos/editar/:id', component: QuadrinhoFormComponent },
-  { path: 'fornecedores/novo', component: FornecedorFormComponent },
-  { path: 'funcionarios/novo', component: FuncionarioFormComponent },
+  { path: 'quadrinhos/novo', component: QuadrinhoFormComponent, canActivate: [AuthGuard] },
+  { path: 'quadrinhos/editar/:id', component: QuadrinhoFormComponent, canActivate: [AuthGuard] },
+  { path: 'fornecedores/novo', component: FornecedorFormComponent, canActivate: [AuthGuard] },
+  { path: 'funcionarios/novo', component: FuncionarioFormComponent, canActivate: [AuthGuard] },
+  
   { path: '**', redirectTo: '/quadrinhos' }
 ];
