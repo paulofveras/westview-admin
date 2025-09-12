@@ -1,12 +1,16 @@
 import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http'; // 1. IMPORTE AQUI
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
+import { authInterceptor } from './interceptors/auth.interceptor'; // Importando a função
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    provideHttpClient() // 2. ADICIONE AQUI
+    // Agora passamos a função do interceptor diretamente
+    provideHttpClient(
+      withInterceptors([authInterceptor])
+    )
   ]
 };

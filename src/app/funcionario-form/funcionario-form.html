@@ -1,0 +1,92 @@
+<div class="container">
+  <h1>Cadastrar Funcionário</h1>
+
+  <div *ngIf="mensagem" [class]="'mensagem ' + tipoMensagem">
+    {{ mensagem }}
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="nome">Nome Completo:</label>
+      <input type="text" id="nome" formControlName="nome">
+      <div *ngIf="form.get('nome')?.invalid && form.get('nome')?.touched" class="erro">
+        Nome é obrigatório (4-60 caracteres)
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input type="email" id="email" formControlName="email">
+      <div *ngIf="form.get('email')?.invalid && form.get('email')?.touched" class="erro">
+        Email inválido
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="username">Usuário:</label>
+      <input type="text" id="username" formControlName="username">
+      <div *ngIf="form.get('username')?.invalid && form.get('username')?.touched" class="erro">
+        Usuário é obrigatório (mínimo 3 caracteres)
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="senha">Senha:</label>
+      <input type="password" id="senha" formControlName="senha">
+      <div *ngIf="form.get('senha')?.invalid && form.get('senha')?.touched" class="erro">
+        Senha deve ter pelo menos 6 caracteres
+      </div>
+    </div>
+
+    <h3>Endereço</h3>
+    <div formGroupName="endereco">
+      <div class="form-group">
+        <label for="cep">CEP:</label>
+        <input type="text" id="cep" formControlName="cep" placeholder="00000000">
+        <div *ngIf="form.get('endereco.cep')?.invalid && form.get('endereco.cep')?.touched" class="erro">
+          CEP deve ter 8 dígitos
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="rua">Rua:</label>
+        <input type="text" id="rua" formControlName="rua">
+        <div *ngIf="form.get('endereco.rua')?.invalid && form.get('endereco.rua')?.touched" class="erro">
+          Rua é obrigatória
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="numero">Número:</label>
+        <input type="number" id="numero" formControlName="numero">
+        <div *ngIf="form.get('endereco.numero')?.invalid && form.get('endereco.numero')?.touched" class="erro">
+          Número é obrigatório
+        </div>
+      </div>
+    </div>
+
+    <h3>Telefone</h3>
+    <div formGroupName="telefone">
+      <div class="form-group">
+        <label for="codigoArea">DDD:</label>
+        <input type="text" id="codigoArea" formControlName="codigoArea" placeholder="11">
+        <div *ngIf="form.get('telefone.codigoArea')?.invalid && form.get('telefone.codigoArea')?.touched" class="erro">
+          DDD deve ter 2 dígitos
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="numeroTelefone">Número:</label>
+        <input type="text" id="numeroTelefone" formControlName="numero" placeholder="999999999">
+        <div *ngIf="form.get('telefone.numero')?.invalid && form.get('telefone.numero')?.touched" class="erro">
+          Número deve ter 8 ou 9 dígitos
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="submit" [disabled]="form.invalid">Cadastrar Funcionário</button>
+      <a routerLink="/funcionarios">Voltar para lista</a>
+    </div>
+  </form>
+</div>

@@ -1,15 +1,20 @@
 import { Routes } from '@angular/router';
 import { QuadrinhoListComponent } from './quadrinho-list/quadrinho-list';
 import { QuadrinhoFormComponent } from './quadrinho-form/quadrinho-form';
+import { ClienteFormComponent } from './cliente-form/cliente-form';
+import { FornecedorFormComponent } from './fornecedor-form/fornecedor-form';
+import { FuncionarioFormComponent } from './funcionario-form/funcionario-form';
+import { LoginComponent } from './login/login.component';
+import { AuthGuard } from './guards/auth.guards';
 
-// Este é o formato correto para projetos standalone
 export const routes: Routes = [
-  // Quando a URL for /quadrinhos, mostre a lista
+  { path: '', redirectTo: '/quadrinhos', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent },
+  { path: 'cadastro', component: ClienteFormComponent },
   { path: 'quadrinhos', component: QuadrinhoListComponent },
-  // Quando for /quadrinhos/novo, mostre o formulário para criar
   { path: 'quadrinhos/novo', component: QuadrinhoFormComponent },
-  // Quando for /quadrinhos/editar/:id, mostre o formulário para editar
   { path: 'quadrinhos/editar/:id', component: QuadrinhoFormComponent },
-  // Redireciona a rota principal '' para '/quadrinhos'
-  { path: '', redirectTo: '/quadrinhos', pathMatch: 'full' }
+  { path: 'fornecedores/novo', component: FornecedorFormComponent },
+  { path: 'funcionarios/novo', component: FuncionarioFormComponent },
+  { path: '**', redirectTo: '/quadrinhos' }
 ];
