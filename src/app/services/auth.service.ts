@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 
 export interface AuthResponse {
+  token: string;
   usuario: any;
 }
 
@@ -23,33 +24,23 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(username: string, password: string, perfil: number): Observable<HttpResponse<AuthResponse>> {
+  login(username: string, password: string, perfil: number): Observable<AuthResponse> {
     const authRequest: AuthRequest = {
       username,
       senha: password,
       perfil
     };
 
-    return this.http.post<AuthResponse>(this.apiUrl, authRequest, {
-      observe: 'response' // Isso nos permite acessar os headers
-    }).pipe(
+    return this.http.post<AuthResponse>(this.apiUrl, authRequest).pipe(
       tap(response => {
-        if (response && response.headers) {
-          const authHeader = response.headers.get('Authorization');
-          if (authHeader && authHeader.startsWith('Bearer ')) {
-            const token = authHeader.substring(7); // Remove 'Bearer ' do início
-            this.setToken(token);
-            
-            // Se o backend também retornar dados do usuário no body
-            if (response.body) {
-              this.setUsuario(response.body.usuario);
-            } else {
-              // Se não, criamos um objeto básico com o username
-              this.setUsuario({ username: username });
-            }
-            
-            this.isAuthenticatedSubject.next(true);
-          }
+        console.log('Resposta completa do login:', response); // Debug
+        if (response && response.token) {
+          this.setToken(response.token);
+          this.setUsuario(response.usuario || { username: username });
+          this.isAuthenticatedSubject.next(true);
+          console.log('Login bem-sucedido - Token salvo'); // Debug
+        } else {
+          console.error('Token não encontrado na resposta'); // Debug
         }
       })
     );
@@ -59,19 +50,23 @@ export class AuthService {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.usuarioKey);
     this.isAuthenticatedSubject.next(false);
+    console.log('Logout realizado'); // Debug
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    const token = localStorage.getItem(this.tokenKey);
+    console.log('Token recuperado do localStorage:', token); // Debug
+    return token;
   }
 
   setToken(token: string): void {
     localStorage.setItem(this.tokenKey, token);
-    console.log('Token salvo:', token); // Para debug
+    console.log('Token salvo no localStorage:', token); // Debug
   }
 
   setUsuario(usuario: any): void {
     localStorage.setItem(this.usuarioKey, JSON.stringify(usuario));
+    console.log('Usuário salvo:', usuario); // Debug
   }
 
   getUsuario(): any {
@@ -85,13 +80,18 @@ export class AuthService {
 
   hasToken(): boolean {
     const token = this.getToken();
-    return !!token;
+    const hasToken = !!token;
+    console.log('Tem token?', hasToken); // Debug
+    return hasToken;
   }
 
   // Método para debug
   debugAuth(): void {
+    console.log('=== DEBUG AUTH ===');
     console.log('Token:', this.getToken());
     console.log('Usuário:', this.getUsuario());
     console.log('Tem token?', this.hasToken());
+    console.log('LocalStorage completo:', localStorage);
+    console.log('==================');
   }
 }
