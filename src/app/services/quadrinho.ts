@@ -68,8 +68,17 @@ export class QuadrinhoService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  // Novo método para upload de imagem
-  uploadImage(id: number, formData: FormData): Observable<void> {
-    return this.http.patch<void>(`${this.apiUrl}/${id}/image/upload`, formData);
+  uploadImagem(id: number, imagem: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('nomeImagem', imagem.name);
+    formData.append('imagem', imagem);
+
+    // O HttpClient do Angular define o Content-Type como multipart/form-data automaticamente
+    return this.http.patch(`${this.apiUrl}/${id}/image/upload`, formData);
+  }
+
+  // NOVO MÉTODO para obter a URL da imagem
+  getImageUrl(nomeImagem: string): string {
+    return `${this.apiUrl}/image/download/${nomeImagem}`;
   }
 }

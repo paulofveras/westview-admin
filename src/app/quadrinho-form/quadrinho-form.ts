@@ -26,6 +26,8 @@ export class QuadrinhoFormComponent implements OnInit {
   fornecedores: FornecedorResponseDTO[] = [];
   mensagem: string = '';
   tipoMensagem: 'sucesso' | 'erro' = 'sucesso';
+  imagemSelecionada: File | null = null;
+  imageUrl: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -66,11 +68,16 @@ export class QuadrinhoFormComponent implements OnInit {
             ...data,
             id_material: data.material.id,
             id_fornecedor: data.fornecedor.id
+            
           });
+           if (data.nomeImagem) {
+            this.imageUrl = this.service.getImageUrl(data.nomeImagem);
+          }
         },
         error: (error: any) => {
           this.mostrarMensagem('Erro ao carregar quadrinho', 'erro');
         }
+        
       });
     }
   }
@@ -119,39 +126,60 @@ export class QuadrinhoFormComponent implements OnInit {
       });
   }
 
+  // Novo método para capturar o arquivo selecionado
+  onFileSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      this.imagemSelecionada = file;
+      const reader = new FileReader();
+      reader.onload = e => this.imageUrl = reader.result as string;
+      reader.readAsDataURL(file);
+    }
+  }
+
   onSubmit(): void {
-    if (this.form.valid) {
-      const dados = this.form.value;
+    if (this.form.invalid) {
+      return;
+    }
 
-      const operacao: Observable<Quadrinho | void> = this.isEditMode && this.quadrinhoId
-        ? this.service.update(this.quadrinhoId, dados)
-        : this.service.create(dados);
-
-      operacao.pipe(
-        catchError((error: HttpErrorResponse) => {
-          if (error.status === 401) {
-            this.mostrarMensagem('Sessão expirada. Faça login novamente.', 'erro');
-            this.authService.logout();
-            this.router.navigate(['/login']);
-          } else {
-            this.mostrarMensagem('Erro ao salvar quadrinho', 'erro');
-          }
-          return of(null);
-        })
-      ).subscribe({
-        next: (response: Quadrinho | void | null) => {
-          if (response !== null) {
-            if (this.isEditMode) {
-              this.mostrarMensagem('Quadrinho atualizado com sucesso!');
-            } else {
-              this.mostrarMensagem('Quadrinho criado com sucesso!');
-            }
+    const handleSuccess = (quadrinhoId: number, isEdit: boolean) => {
+      const message = `Quadrinho ${isEdit ? 'atualizado' : 'criado'} com sucesso!`;
+      
+      if (this.imagemSelecionada) {
+        this.service.uploadImagem(quadrinhoId, this.imagemSelecionada).subscribe({
+          next: () => {
+            this.mostrarMensagem(message);
             setTimeout(() => this.router.navigate(['/quadrinhos']), 1500);
+          },
+          error: () => {
+            this.mostrarMensagem(`Dados salvos, mas falha ao enviar imagem.`, 'erro');
           }
-        },
-        error: (error: any) => {
-          this.mostrarMensagem('Erro inesperado ao salvar quadrinho', 'erro');
-        }
+        });
+      } else {
+        this.mostrarMensagem(message);
+        setTimeout(() => this.router.navigate(['/quadrinhos']), 1500);
+      }
+    };
+
+    const handleError = (error: HttpErrorResponse) => {
+      if (error.status === 401) {
+        this.mostrarMensagem('Sessão expirada. Faça login novamente.', 'erro');
+        this.authService.logout();
+        this.router.navigate(['/login']);
+      } else {
+        this.mostrarMensagem('Erro ao salvar dados do quadrinho', 'erro');
+      }
+    };
+
+    if (this.isEditMode && this.quadrinhoId) {
+      this.service.update(this.quadrinhoId, this.form.value).subscribe({
+        next: () => handleSuccess(this.quadrinhoId!, true),
+        error: handleError
+      });
+    } else {
+      this.service.create(this.form.value).subscribe({
+        next: (quadrinhoCriado) => handleSuccess(quadrinhoCriado.id, false),
+        error: handleError
       });
     }
   }

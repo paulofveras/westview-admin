@@ -65,6 +65,15 @@
       </div>
     </div>
 
+        <div class="form-group">
+      <label for="imagem">Imagem do Quadrinho:</label>
+      <div *ngIf="imageUrl" class="image-preview">
+        <img [src]="imageUrl" alt="Prévia da imagem" style="max-width: 200px; margin-top: 10px; border-radius: 4px;">
+      </div>
+      <input type="file" id="imagem" (change)="onFileSelected($event)" accept="image/png, image/jpeg, image/gif">
+    </div>
+
+
     <div class="form-group">
       <label for="estoque">Estoque:</label>
       <input type="number" id="estoque" formControlName="estoque">
