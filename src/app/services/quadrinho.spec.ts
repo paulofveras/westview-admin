@@ -1,13 +1,15 @@
 import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing'; // Importe o módulo de teste HTTP
+import { QuadrinhoService } from './quadrinho.service'; // CORRIGIDO: Importe o SERVIÇO
 
-import { Quadrinho } from './quadrinho.service';
-
-describe('Quadrinho', () => {
-  let service: Quadrinho;
+describe('QuadrinhoService', () => { // CORRIGIDO: Descreva o SERVIÇO
+  let service: QuadrinhoService; // CORRIGIDO: A variável deve ser do tipo do SERVIÇO
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(Quadrinho);
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule] // Adicione o módulo de teste HTTP
+    });
+    service = TestBed.inject(QuadrinhoService); // CORRIGIDO: Injete o SERVIÇO
   });
 
   it('should be created', () => {

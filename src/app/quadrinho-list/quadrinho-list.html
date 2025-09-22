@@ -1,117 +1,32 @@
-<div class="page-container">
-  <!-- Navegação Principal -->
-  <nav class="main-navigation">
-    <div class="nav-header">
-      <h2>Westview Admin</h2>
-      <p>Sistema de Gerenciamento</p>
+<div class="table-container">
+    <div class="table-header">
+      <h2>Lista de Quadrinhos</h2>
+      <a *ngIf="authService.isFuncionario()" routerLink="/quadrinhos/new" class="btn-primary">Novo Quadrinho</a>
     </div>
-    
-    <div class="nav-menu">
-      <div class="nav-section">
-        <h3>Quadrinhos</h3>
-        <div class="nav-buttons">
-          <a routerLink="/quadrinhos" class="nav-btn active">
-            <span class="icon">📚</span>
-            <div>
-              <strong>Listar Quadrinhos</strong>
-              <small>Visualizar todos</small>
-            </div>
-          </a>
-          <a routerLink="/quadrinhos/novo" class="nav-btn">
-            <span class="icon">➕</span>
-            <div>
-              <strong>Novo Quadrinho</strong>
-              <small>Cadastrar novo</small>
-            </div>
-          </a>
-        </div>
-      </div>
-
-      <div class="nav-section">
-        <h3>Cadastros</h3>
-        <div class="nav-buttons">
-          <a routerLink="/cadastro" class="nav-btn">
-            <span class="icon">👤</span>
-            <div>
-              <strong>Cliente</strong>
-              <small>Novo cadastro</small>
-            </div>
-          </a>
-          <a routerLink="/fornecedores/novo" class="nav-btn">
-            <span class="icon">🏢</span>
-            <div>
-              <strong>Fornecedor</strong>
-              <small>Novo cadastro</small>
-            </div>
-          </a>
-          <a routerLink="/funcionarios/novo" class="nav-btn">
-            <span class="icon">👥</span>
-            <div>
-              <strong>Funcionário</strong>
-              <small>Novo cadastro</small>
-            </div>
-          </a>
-        </div>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Conteúdo Principal -->
-  <div class="container">
-    <div class="content-header">
-      <h1>Gerenciamento de Quadrinhos</h1>
-      <div class="actions">
-        <a routerLink="/quadrinhos/novo" class="btn-add">
-          + Adicionar Novo Quadrinho
-        </a>
-      </div>
-    </div>
-
-    <!-- Mensagem de feedback -->
-    <div *ngIf="mensagem" [class]="'mensagem ' + tipoMensagem">
-      {{ mensagem }}
-    </div>
-
-    <!-- Tabela de Quadrinhos -->
-    <div class="table-container">
-      <table *ngIf="quadrinhos.length > 0; else noData">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Preço</th>
-            <th>Estoque</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let quad of quadrinhos">
-            <td>{{ quad.id }}</td>
-            <td>{{ quad.nome }}</td>
-            <td>{{ quad.preco | currency:'BRL' }}</td>
-            <td>{{ quad.estoque }}</td>
-            <td class="actions-cell">
-              <a [routerLink]="['/quadrinhos/editar', quad.id]" class="btn-edit" title="Editar">
-                ✏️
-              </a>
-              <button (click)="excluir(quad.id)" class="btn-delete" title="Excluir">
-                🗑️
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <ng-template #noData>
-        <div class="no-data">
-          <div class="no-data-icon">📚</div>
-          <h3>Nenhum quadrinho cadastrado</h3>
-          <p>Comece cadastrando seu primeiro quadrinho!</p>
-          <a routerLink="/quadrinhos/novo" class="btn-add">
-            + Cadastrar Primeiro Quadrinho
-          </a>
-        </div>
-      </ng-template>
-    </div>
+  
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Preço</th>
+          <th>Estoque</th>
+          <th>Fornecedor</th>
+          <th *ngIf="authService.isFuncionario()">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let quadrinho of quadrinhos">
+          <td>{{ quadrinho.id }}</td>
+          <td>{{ quadrinho.nome }}</td>
+          <td>{{ quadrinho.preco | currency:'BRL' }}</td>
+          <td>{{ quadrinho.estoque }}</td>
+          <td>{{ quadrinho.fornecedor.nome }}</td>
+          <td *ngIf="authService.isFuncionario()">
+            <a [routerLink]="['/quadrinhos/edit', quadrinho.id]" class="btn-sm btn-secondary">Editar</a>
+            <button (click)="excluir(quadrinho)" class="btn-sm btn-danger">Excluir</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-</div>

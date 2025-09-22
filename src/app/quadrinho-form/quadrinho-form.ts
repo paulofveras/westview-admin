@@ -17,8 +17,14 @@ import { AuthService } from '../services/auth.service';
 })
 export class QuadrinhoFormComponent implements OnInit {
 
-  formGroup: FormGroup;
+  // Adicionando as propriedades que estavam faltando no seu .ts
+  formGroup: FormGroup; // O nome correto que estamos usando é 'formGroup'
+  isEditMode: boolean = false;
   fornecedores: Fornecedor[] = [];
+  
+  // Propriedades para upload de imagem
+  selectedFile: File | null = null;
+  imageUrl: string | ArrayBuffer | null = null;
 
   constructor(private formBuilder: FormBuilder,
               private quadrinhoService: QuadrinhoService,
@@ -28,6 +34,9 @@ export class QuadrinhoFormComponent implements OnInit {
               private authService: AuthService) {
 
     const quadrinho: Quadrinho = this.activatedRoute.snapshot.data['quadrinho'];
+    
+    // Define se estamos no modo de edição
+    this.isEditMode = (quadrinho && quadrinho.id) ? true : false;
 
     this.formGroup = formBuilder.group({
       id: [(quadrinho && quadrinho.id) ? quadrinho.id : null],
@@ -40,7 +49,6 @@ export class QuadrinhoFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // A verificação agora usa o método correto: isLoggedIn()
     if (!this.authService.isLoggedIn()) {
       this.router.navigateByUrl('/login');
       return;
@@ -54,41 +62,42 @@ export class QuadrinhoFormComponent implements OnInit {
   salvar() {
     if (this.formGroup.valid) {
       const quadrinho = this.formGroup.value;
-      if (quadrinho.id == null) {
-        this.quadrinhoService.save(quadrinho).subscribe({
-          next: (quadrinhoCadastrado) => {
-            this.router.navigateByUrl('/quadrinhos/list');
-          },
-          error: (err) => {
-            console.log('Erro ao Incluir' + JSON.stringify(err));
-          }
-        });
-      } else {
-        this.quadrinhoService.update(quadrinho).subscribe({
-          next: (quadrinhoAlterado) => {
-            this.router.navigateByUrl('/quadrinhos/list');
-          },
-          error: (err) => {
-            console.log('Erro ao Editar' + JSON.stringify(err));
-          }
-        });
-      }
+      const operacao = quadrinho.id == null 
+        ? this.quadrinhoService.save(quadrinho)
+        : this.quadrinhoService.update(quadrinho);
+
+      operacao.subscribe({
+        next: () => {
+          this.router.navigateByUrl('/quadrin hos/list');
+        },
+        error: (err) => {
+          console.log('Erro ao salvar' + JSON.stringify(err));
+        }
+      });
     }
   }
 
   excluir() {
-    if (this.formGroup.valid) {
-      const quadrinho = this.formGroup.value;
-      if (quadrinho.id != null) {
-        this.quadrinhoService.delete(quadrinho).subscribe({
-          next: () => {
-            this.router.navigateByUrl('/quadrinhos/list');
-          },
-          error: (err) => {
-            console.log('Erro ao Excluir' + JSON.stringify(err));
-          }
-        });
-      }
+    const quadrinho = this.formGroup.value;
+    if (quadrinho.id != null) {
+      this.quadrinhoService.delete(quadrinho).subscribe({
+        next: () => {
+          this.router.navigateByUrl('/quadrinhos/list');
+        },
+        error: (err) => {
+          console.log('Erro ao Excluir' + JSON.stringify(err));
+        }
+      });
+    }
+  }
+
+  // Método para lidar com a seleção de arquivo
+  onFileSelected(event: any): void {
+    this.selectedFile = event.target.files[0];
+    if (this.selectedFile) {
+      const reader = new FileReader();
+      reader.onload = e => this.imageUrl = reader.result;
+      reader.readAsDataURL(this.selectedFile);
     }
   }
 }
