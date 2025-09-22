@@ -1,63 +1,87 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { FornecedorService } from '../services/fornecedor.service';
+import { Fornecedor } from '../models/pessoa.model';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-fornecedor-form',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './fornecedor-form.html',
-  styleUrls: ['./fornecedor-form.css']
+  styleUrl: './fornecedor-form.css'
 })
 export class FornecedorFormComponent {
-  form: FormGroup;
-  mensagem: string = '';
-  tipoMensagem: 'sucesso' | 'erro' = 'sucesso';
 
-  constructor(
-    private fb: FormBuilder,
-    private http: HttpClient,
-    private router: Router
-  ) {
-    this.form = this.fb.group({
-      nome: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(60)]],
-      email: ['', [Validators.required, Validators.email]],
-      endereco: this.fb.group({
-        cep: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
-        rua: ['', Validators.required],
-        numero: ['', [Validators.required, Validators.min(1)]]
+  formGroup: FormGroup;
+
+  constructor(private formBuilder: FormBuilder,
+              private fornecedorService: FornecedorService,
+              private router: Router,
+              private activatedRoute: ActivatedRoute) {
+
+    const fornecedor: Fornecedor = this.activatedRoute.snapshot.data['fornecedor'];
+
+    // Estrutura do formulário agora espelha o DTO do backend
+    this.formGroup = formBuilder.group({
+      id: [(fornecedor && fornecedor.id) ? fornecedor.id : null],
+      nome: [(fornecedor && fornecedor.nome) ? fornecedor.nome : '', Validators.required],
+      nomeFantasia: [(fornecedor && fornecedor.nomeFantasia) ? fornecedor.nomeFantasia : ''],
+      cnpj: [(fornecedor && fornecedor.cnpj) ? fornecedor.cnpj : '', Validators.required],
+      email: [(fornecedor && fornecedor.email) ? fornecedor.email : ''],
+      // Grupo para endereço
+      endereco: formBuilder.group({
+        cep: [(fornecedor && fornecedor.endereco.cep) ? fornecedor.endereco.cep : '', Validators.required],
+        rua: [(fornecedor && fornecedor.endereco.rua) ? fornecedor.endereco.rua : '', Validators.required],
+        numero: [(fornecedor && fornecedor.endereco.numero) ? fornecedor.endereco.numero : '', Validators.required]
       }),
-      telefone: this.fb.group({
-        codigoArea: ['', [Validators.required, Validators.pattern(/^\d{2}$/)]],
-        numero: ['', [Validators.required, Validators.pattern(/^\d{8,9}$/)]]
+      // Grupo para telefone
+      telefone: formBuilder.group({
+        codigoArea: [(fornecedor && fornecedor.telefone.codigoArea) ? fornecedor.telefone.codigoArea : '', Validators.required],
+        numero: [(fornecedor && fornecedor.telefone.numero) ? fornecedor.telefone.numero : '', Validators.required]
       })
     });
   }
 
-  onSubmit(): void {
-    if (this.form.valid) {
-      this.http.post('http://localhost:8080/fornecedores', this.form.value)
-        .pipe(
-          catchError(error => {
-            this.mostrarMensagem('Erro ao cadastrar fornecedor', 'erro');
-            return of(null);
-          })
-        )
-        .subscribe(response => {
-          if (response) {
-            this.mostrarMensagem('Fornecedor cadastrado com sucesso!');
-            this.form.reset();
+  salvar() {
+    if (this.formGroup.valid) {
+      const fornecedor = this.formGroup.value;
+      if (fornecedor.id == null) {
+        this.fornecedorService.save(fornecedor).subscribe({
+          next: (fornecedorCadastrado) => {
+            this.router.navigateByUrl('/fornecedores/list');
+          },
+          error: (err) => {
+            console.log('Erro ao Incluir' + JSON.stringify(err));
           }
         });
+      } else {
+        this.fornecedorService.update(fornecedor).subscribe({
+          next: (fornecedorAlterado) => {
+            this.router.navigateByUrl('/fornecedores/list');
+          },
+          error: (err) => {
+            console.log('Erro ao Editar' + JSON.stringify(err));
+          }
+        });
+      }
     }
   }
 
-  private mostrarMensagem(mensagem: string, tipo: 'sucesso' | 'erro' = 'sucesso'): void {
-    this.mensagem = mensagem;
-    this.tipoMensagem = tipo;
-    setTimeout(() => this.mensagem = '', 3000);
+  excluir() {
+    if (this.formGroup.valid) {
+      const fornecedor = this.formGroup.value;
+      if (fornecedor.id != null) {
+        this.fornecedorService.delete(fornecedor).subscribe({
+          next: () => {
+            this.router.navigateByUrl('/fornecedores/list');
+          },
+          error: (err) => {
+            console.log('Erro ao Excluir' + JSON.stringify(err));
+          }
+        });
+      }
+    }
   }
 }

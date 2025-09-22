@@ -1,65 +1,85 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ClienteService } from '../services/cliente.service';
+import { Cliente } from '../models/pessoa.model';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-cliente-form',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './cliente-form.html',
-  styleUrls: ['./cliente-form.css']
+  styleUrl: './cliente-form.css'
 })
 export class ClienteFormComponent {
-  form: FormGroup;
-  mensagem: string = '';
-  tipoMensagem: 'sucesso' | 'erro' = 'sucesso';
 
-  constructor(
-    private fb: FormBuilder,
-    private http: HttpClient,
-    private router: Router
-  ) {
-    this.form = this.fb.group({
-      nome: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(60)]],
-      email: ['', [Validators.required, Validators.email]],
-      username: ['', [Validators.required, Validators.minLength(3)]],
-      senha: ['', [Validators.required, Validators.minLength(6)]],
-      endereco: this.fb.group({
-        cep: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
-        rua: ['', Validators.required],
-        numero: ['', [Validators.required, Validators.min(1)]]
+  formGroup: FormGroup;
+
+  constructor(private formBuilder: FormBuilder,
+              private clienteService: ClienteService,
+              private router: Router,
+              private activatedRoute: ActivatedRoute) {
+
+    const cliente: Cliente = this.activatedRoute.snapshot.data['cliente'];
+
+    this.formGroup = formBuilder.group({
+      id: [(cliente && cliente.id) ? cliente.id : null],
+      nome: [(cliente && cliente.nome) ? cliente.nome : '', Validators.required],
+      cpf: [(cliente && cliente.cpf) ? cliente.cpf : '', Validators.required],
+      email: [(cliente && cliente.email) ? cliente.email : ''],
+      username: [(cliente && cliente.username) ? cliente.username : '', Validators.required],
+      senha: ['', Validators.required],
+      endereco: formBuilder.group({
+        cep: [(cliente && cliente.endereco.cep) ? cliente.endereco.cep : '', Validators.required],
+        rua: [(cliente && cliente.endereco.rua) ? cliente.endereco.rua : '', Validators.required],
+        numero: [(cliente && cliente.endereco.numero) ? cliente.endereco.numero : '', Validators.required]
       }),
-      telefone: this.fb.group({
-        codigoArea: ['', [Validators.required, Validators.pattern(/^\d{2}$/)]],
-        numero: ['', [Validators.required, Validators.pattern(/^\d{8,9}$/)]]
+      telefone: formBuilder.group({
+        codigoArea: [(cliente && cliente.telefone.codigoArea) ? cliente.telefone.codigoArea : '', Validators.required],
+        numero: [(cliente && cliente.telefone.numero) ? cliente.telefone.numero : '', Validators.required]
       })
     });
   }
 
-  onSubmit(): void {
-    if (this.form.valid) {
-      this.http.post('http://localhost:8080/cadastroBasicoCliente', this.form.value)
-        .pipe(
-          catchError(error => {
-            this.mostrarMensagem('Erro ao criar conta. Tente novamente.', 'erro');
-            return of(null);
-          })
-        )
-        .subscribe(response => {
-          if (response) {
-            this.mostrarMensagem('Conta criada com sucesso! Redirecionando para login...');
-            setTimeout(() => this.router.navigate(['/login']), 2000);
+  salvar() {
+    if (this.formGroup.valid) {
+      const cliente = this.formGroup.value;
+      if (cliente.id == null) {
+        this.clienteService.save(cliente).subscribe({
+          next: (clienteCadastrado) => {
+            this.router.navigateByUrl('/clientes/list');
+          },
+          error: (err) => {
+            console.log('Erro ao Incluir' + JSON.stringify(err));
           }
         });
+      } else {
+        this.clienteService.update(cliente).subscribe({
+          next: (clienteAlterado) => {
+            this.router.navigateByUrl('/clientes/list');
+          },
+          error: (err) => {
+            console.log('Erro ao Editar' + JSON.stringify(err));
+          }
+        });
+      }
     }
   }
 
-  private mostrarMensagem(mensagem: string, tipo: 'sucesso' | 'erro' = 'sucesso'): void {
-    this.mensagem = mensagem;
-    this.tipoMensagem = tipo;
-    setTimeout(() => this.mensagem = '', 3000);
+  excluir() {
+    if (this.formGroup.valid) {
+      const cliente = this.formGroup.value;
+      if (cliente.id != null) {
+        this.clienteService.delete(cliente).subscribe({
+          next: () => {
+            this.router.navigateByUrl('/clientes/list');
+          },
+          error: (err) => {
+            console.log('Erro ao Excluir' + JSON.stringify(err));
+          }
+        });
+      }
+    }
   }
 }
