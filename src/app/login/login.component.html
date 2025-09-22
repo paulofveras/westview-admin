@@ -1,6 +1,6 @@
-<div class="container">
-  <div class="login-card">
-    <h1>Westview Admin</h1>
+<div class="login-container">
+  <div class="login-form">
+    <h2>Login Administrativo</h2>
     
     <div *ngIf="mensagem" [class]="'mensagem ' + tipoMensagem">
       {{ mensagem }}
@@ -8,29 +8,24 @@
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="form-group">
-        <label for="username">Usuário:</label>
-        <input type="text" id="username" formControlName="username" placeholder="Digite seu usuário">
+        <label for="username">Usuário</label>
+        <input type="text" id="username" formControlName="username" required>
       </div>
-
       <div class="form-group">
-        <label for="password">Senha:</label>
-        <input type="password" id="password" formControlName="password" placeholder="Digite sua senha">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" formControlName="senha" required>
       </div>
-
       <div class="form-group">
-        <label for="perfil">Tipo de Usuário:</label>
+        <label for="perfil">Perfil</label>
         <select id="perfil" formControlName="perfil">
-          <option value="1">Funcionário</option>
-          <option value="2">Cliente</option>
+            <option [ngValue]="1">Administrador</option>
+            <option [ngValue]="2">Cliente</option>
         </select>
       </div>
-
-      <button type="submit" [disabled]="form.invalid || isLoading">
-        {{ isLoading ? 'Entrando...' : 'Entrar' }}
-      </button>
-
-      <div class="register-link">
-        <p>Não tem uma conta? <a routerLink="/cadastro">Cadastre-se</a></p>
+      <div class="form-group">
+        <button type="submit" [disabled]="form.invalid || isLoading">
+          {{ isLoading ? 'Entrando...' : 'Entrar' }}
+        </button>
       </div>
     </form>
   </div>

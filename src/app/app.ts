@@ -1,22 +1,21 @@
-import { Component, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component } from '@angular/core';
+import { RouterModule, RouterOutlet } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterModule, CommonModule],
+  imports: [CommonModule, RouterOutlet, RouterModule],
   templateUrl: './app.html',
-  styleUrls: ['./app.css']
+  styleUrl: './app.css'
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'westview-admin';
 
-  constructor(private authService: AuthService) {}
+  constructor(public authService: AuthService) {}
 
-  ngOnInit(): void {
-    console.log('App iniciado - Status de autenticação:');
-    this.authService.debugAuth();
+  logout() {
+    this.authService.logout();
   }
 }

@@ -1,0 +1,29 @@
+<div class="table-container">
+  <div class="table-header">
+    <h2>Lista de Fornecedores</h2>
+    <a *ngIf="authService.isFuncionario()" routerLink="/fornecedores/new" class="btn-primary">Novo Fornecedor</a>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Razão Social</th>
+        <th>Nome Fantasia</th>
+        <th>CNPJ</th>
+        <th *ngIf="authService.isFuncionario()">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let fornecedor of fornecedores">
+        <td>{{ fornecedor.id }}</td>
+        <td>{{ fornecedor.nome }}</td>
+        <td>{{ fornecedor.nomeFantasia }}</td>
+        <td>{{ fornecedor.cnpj }}</td>
+        <td *ngIf="authService.isFuncionario()">
+          <a [routerLink]="['/fornecedores/edit', fornecedor.id]" class="btn-sm btn-secondary">Editar</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

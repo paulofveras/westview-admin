@@ -1,22 +1,29 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, Router, ActivatedRouteSnapshot } from '@angular/router';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class AuthGuard implements CanActivate {
-  constructor(private authService: AuthService, private router: Router) {}
+export const authGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
 
-  canActivate(route: ActivatedRouteSnapshot): boolean {
-    if (this.authService.hasToken()) {
-      return true;
-    } else {
-      // Redirecionar para login com a URL de retorno
-      this.router.navigate(['/login'], { 
-        queryParams: { returnUrl: route.url.join('/') } 
-      });
+  // Se o usuário não estiver logado, redireciona para a página de login
+  if (!authService.isLoggedIn()) {
+    router.navigate(['/login']);
+    return false;
+  }
+
+  // Obtém as roles esperadas para a rota, se houver alguma definida
+  const requiredRoles = route.data['roles'] as string[];
+
+  // Se a rota exige roles e o usuário não tem nenhuma delas, nega o acesso
+  if (requiredRoles && requiredRoles.length > 0) {
+    if (!requiredRoles.some(role => authService.hasRole(role))) {
+      // Opcional: redirecionar para uma página de "acesso negado" ou de volta para a home
+      router.navigate(['/']); // ou para uma página de acesso negado
       return false;
     }
   }
-}
+
+  // Se passou por todas as verificações, permite o acesso
+  return true;
+};

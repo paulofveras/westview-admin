@@ -1,74 +1,50 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { catchError, of } from 'rxjs';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrl: './login.component.css'
 })
 export class LoginComponent {
-  form: FormGroup;
+  // Renomeado de volta para 'form' para corresponder ao HTML
+  form: FormGroup; 
+  
+  // Adicionadas as propriedades que o HTML esperava
   mensagem: string = '';
   tipoMensagem: 'sucesso' | 'erro' = 'erro';
-  isLoading = false;
+  isLoading: boolean = false;
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
-  ) {
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.form = this.fb.group({
       username: ['', Validators.required],
-      password: ['', Validators.required],
-      perfil: ['1', Validators.required]
+      senha: ['', Validators.required],
+      perfil: [1, Validators.required] // Perfil 1 = Funcionario por padrão
     });
   }
 
   onSubmit(): void {
     if (this.form.valid) {
-      this.isLoading = true;
-      const { username, password, perfil } = this.form.value;
-
-      this.authService.login(username, password, parseInt(perfil)).pipe(
-        catchError(error => {
-          this.isLoading = false;
-          console.error('Erro no login:', error);
-          if (error.status === 401 || error.status === 404) {
-            this.mostrarMensagem('Usuário ou senha inválidos', 'erro');
-          } else {
-            this.mostrarMensagem('Erro de conexão. Tente novamente.', 'erro');
-          }
-          return of(null);
-        })
-      ).subscribe(response => {
-        this.isLoading = false;
-        if (response) {
-          console.log('Login bem-sucedido!', response);
-          this.mostrarMensagem('Login realizado com sucesso!', 'sucesso');
-          
-          // Debug: verificar se o token foi salvo
-          this.authService.debugAuth();
-          
-          // Redirecionar após breve delay
-          setTimeout(() => {
-            this.router.navigate(['/quadrinhos']);
-          }, 1000);
-        } else {
-          this.mostrarMensagem('Erro no login. Tente novamente.', 'erro');
+      this.isLoading = true; // Ativa o estado de carregamento
+      this.authService.login(this.form.value).subscribe({
+        next: (response) => {
+          this.isLoading = false; // Desativa o carregamento
+          console.log('Login bem-sucedido', response);
+          this.router.navigate(['/quadrinhos/list']);
+        },
+        error: (err) => {
+          this.isLoading = false; // Desativa o carregamento
+          console.error('Erro no login', err);
+          // Define a mensagem de erro para ser exibida no HTML
+          this.mensagem = 'Usuário ou senha inválidos.';
+          this.tipoMensagem = 'erro';
         }
       });
     }
-  }
-
-  private mostrarMensagem(mensagem: string, tipo: 'sucesso' | 'erro' = 'sucesso'): void {
-    this.mensagem = mensagem;
-    this.tipoMensagem = tipo;
-    setTimeout(() => this.mensagem = '', 3000);
   }
 }

@@ -1,37 +1,25 @@
-import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
-import { Router } from '@angular/router';
-import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 
-export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const authService = inject(AuthService);
-  const router = inject(Router);
+@Injectable()
+export class AuthInterceptor implements HttpInterceptor {
 
-  const token = authService.getToken();
-  console.log('Interceptor - Token encontrado:', token); // Debug
+  constructor(private authService: AuthService) {}
 
-  let authReq = req;
+  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    const token = this.authService.getToken();
 
-  if (token) {
-    authReq = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    console.log('Interceptor - Header Authorization adicionado'); // Debug
+    // Se o token existir, clona a requisição e adiciona o cabeçalho de autorização
+    if (token) {
+      const cloned = request.clone({
+        headers: request.headers.set('Authorization', `Bearer ${token}`)
+      });
+      return next.handle(cloned);
+    }
+
+    // Se não houver token, passa a requisição original
+    return next.handle(request);
   }
-
-  return next(authReq).pipe(
-    catchError((error) => {
-      console.log('Interceptor - Erro:', error.status); // Debug
-      if (error.status === 401) {
-        console.log('Erro 401: Não autorizado. Redirecionando para login.');
-        authService.logout();
-        router.navigate(['/login']);
-      }
-      return throwError(() => error);
-    })
-  );
-};
+}

@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { RouterModule } from '@angular/router';
 
-import { Quadrinho, QuadrinhoService } from '../services/quadrinho'; // Assumi que o nome do arquivo de serviço é quadrinho.service.ts
+import { Quadrinho, QuadrinhoService } from '../services/quadrinho.service'; // Assumi que o nome do arquivo de serviço é quadrinho.service.ts
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { of } from 'rxjs';
 
