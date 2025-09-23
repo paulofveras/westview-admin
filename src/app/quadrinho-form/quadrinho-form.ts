@@ -4,6 +4,8 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Quadrinho } from '../models/quadrinho.model';
 import { Fornecedor } from '../models/pessoa.model';
+import { Material } from '../models/material.model';
+import { MaterialService } from '../services/material.service';
 import { QuadrinhoService } from '../services/quadrinho.service';
 import { FornecedorService } from '../services/fornecedor.service';
 import { AuthService } from '../services/auth.service';
@@ -20,32 +22,35 @@ export class QuadrinhoFormComponent implements OnInit {
   formGroup: FormGroup;
   isEditMode: boolean = false;
   fornecedores: Fornecedor[] = [];
+  materiais: Material[] = []; // Adicione esta linha
   
   selectedFile: File | null = null;
-  imageUrl: string | ArrayBuffer | null = null;
+  imagePreview: string | ArrayBuffer | null = null;
 
   constructor(private formBuilder: FormBuilder,
               private quadrinhoService: QuadrinhoService,
               private fornecedorService: FornecedorService,
+              private materialService: MaterialService, // Injete o serviço
               private router: Router,
               private activatedRoute: ActivatedRoute,
               private authService: AuthService) {
 
-    // Pegamos o objeto 'quadrinho' que o nosso resolver preparou.
     const quadrinho: Quadrinho = this.activatedRoute.snapshot.data['quadrinho'];
-
-    // Se o quadrinho tem um ID, então estamos no modo de edição.
     this.isEditMode = (quadrinho && quadrinho.id) ? true : false;
 
+    if (this.isEditMode && quadrinho.nomeImagem) {
+      this.imagePreview = this.quadrinhoService.getImageUrl(quadrinho.nomeImagem);
+    }
+
     this.formGroup = formBuilder.group({
-      // Populamos o formulário com os dados do 'quadrinho' resolvido.
       id: [quadrinho?.id],
       nome: [quadrinho?.nome, Validators.required],
       descricao: [quadrinho?.descricao, Validators.required],
       preco: [quadrinho?.preco, Validators.required],
       estoque: [quadrinho?.estoque, Validators.required],
-      // No modo de edição, o ID do fornecedor já vem pré-selecionado.
-      idFornecedor: [quadrinho?.fornecedor?.id, Validators.required]
+      idFornecedor: [quadrinho?.fornecedor?.id, Validators.required],
+      // Adicione o campo de material ao formulário
+      idMaterial: [quadrinho?.material?.id, Validators.required] 
     });
   }
 
@@ -55,11 +60,17 @@ export class QuadrinhoFormComponent implements OnInit {
       return;
     }
 
+    // Busca os fornecedores E os materiais quando o componente inicia
     this.fornecedorService.findAll().subscribe(data => {
       this.fornecedores = data;
     });
-  }
 
+    this.materialService.findAll().subscribe(data => {
+      this.materiais = data;
+    });
+  }
+  
+  // O método salvar permanece o mesmo, pois o formGroup já inclui o idMaterial
   salvar() {
     if (this.formGroup.valid) {
       const quadrinho = this.formGroup.value;
@@ -68,36 +79,41 @@ export class QuadrinhoFormComponent implements OnInit {
         : this.quadrinhoService.save(quadrinho);
 
       operacao.subscribe({
-        next: () => {
-          this.router.navigateByUrl('/quadrinhos/list');
+        next: (quadrinhoSalvo) => {
+          if (this.selectedFile) {
+            this.quadrinhoService.uploadImagem(quadrinhoSalvo.id, this.selectedFile.name, this.selectedFile)
+              .subscribe({
+                next: () => this.router.navigateByUrl('/quadrinhos/list'),
+                error: (err) => console.log('Erro ao fazer upload da imagem', err)
+              });
+          } else {
+            this.router.navigateByUrl('/quadrinhos/list');
+          }
         },
-        error: (err) => {
-          console.log('Erro ao salvar' + JSON.stringify(err));
-        }
-      });
-    }
-  }
-
-  excluir() {
-    if (this.isEditMode) {
-      const quadrinho = this.formGroup.value;
-      this.quadrinhoService.delete(quadrinho).subscribe({
-        next: () => {
-          this.router.navigateByUrl('/quadrinhos/list');
-        },
-        error: (err) => {
-          console.log('Erro ao Excluir' + JSON.stringify(err));
-        }
+        error: (err) => console.log('Erro ao salvar dados do quadrinho' + JSON.stringify(err))
       });
     }
   }
 
   onFileSelected(event: any): void {
-    this.selectedFile = event.target.files[0];
-    if (this.selectedFile) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
       const reader = new FileReader();
-      reader.onload = e => this.imageUrl = reader.result;
-      reader.readAsDataURL(this.selectedFile);
+      reader.onload = e => this.imagePreview = reader.result;
+      reader.readAsDataURL(file);
+    }
+  }
+
+  excluir() {
+    if (this.isEditMode) {
+      if (confirm('Tem certeza que deseja excluir este quadrinho?')) {
+        const quadrinho = this.formGroup.value;
+        this.quadrinhoService.delete(quadrinho).subscribe({
+          next: () => this.router.navigateByUrl('/quadrinhos/list'),
+          error: (err) => console.log('Erro ao Excluir' + JSON.stringify(err))
+        });
+      }
     }
   }
 }

@@ -58,3 +58,11 @@ td .btn-secondary,
 td .btn-danger {
     margin-right: 8px;
 }
+
+/* Adicione este código ao final do arquivo */
+.capa-quadrinho {
+  width: 60px;
+  height: auto;
+  border-radius: 4px;
+  object-fit: cover;
+}

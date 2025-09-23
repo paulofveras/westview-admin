@@ -7,6 +7,7 @@
     <table>
       <thead>
         <tr>
+          <th>Capa</th>
           <th>ID</th>
           <th>Nome</th>
           <th>Preço</th>
@@ -17,6 +18,9 @@
       </thead>
       <tbody>
         <tr *ngFor="let quadrinho of quadrinhos">
+          <td>
+            <img [src]="getImageUrl(quadrinho.nomeImagem)" alt="Capa de {{quadrinho.nome}}" class="capa-quadrinho">
+          </td>
           <td>{{ quadrinho.id }}</td>
           <td>{{ quadrinho.nome }}</td>
           <td>{{ quadrinho.preco | currency:'BRL' }}</td>

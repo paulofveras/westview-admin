@@ -25,6 +25,11 @@ export class QuadrinhoListComponent implements OnInit {
     });
   }
 
+    // Método para ser usado pelo HTML
+  getImageUrl(nomeImagem: string): string {
+    return this.quadrinhoService.getImageUrl(nomeImagem);
+  }
+
   // CORREÇÃO: A função agora recebe o objeto 'quadrinho' inteiro
   excluir(quadrinho: Quadrinho): void {
     if (confirm(`Deseja realmente excluir o quadrinho "${quadrinho.nome}"?`)) {

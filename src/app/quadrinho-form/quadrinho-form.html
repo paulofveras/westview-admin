@@ -3,42 +3,53 @@
   <ng-template #createTitle><h2>Novo Quadrinho</h2></ng-template>
 
   <form [formGroup]="formGroup">
-    <div class="form-field">
-      <label>Nome:</label>
-      <input type="text" formControlName="nome">
-    </div>
-
-    <div class="form-field">
-      <label>Descrição:</label>
-      <textarea formControlName="descricao" rows="4"></textarea>
-    </div>
-
-    <div class="form-field">
-      <label>Preço:</label>
-      <input type="number" formControlName="preco">
-    </div>
-
-    <div class="form-field">
-      <label>Estoque:</label>
-      <input type="number" formControlName="estoque">
-    </div>
-
-    <div class="form-field">
-      <label>Fornecedor:</label>
-      <select formControlName="idFornecedor">
-        <option [ngValue]="null" disabled>Selecione um Fornecedor</option>
-        <option *ngFor="let fornecedor of fornecedores" [ngValue]="fornecedor.id">
-          {{ fornecedor.nome }}
-        </option>
-      </select>
-    </div>
-
-    <div class="form-field">
-        <label for="imagem">Imagem do Quadrinho</label>
-        <input type="file" id="imagem" (change)="onFileSelected($event)" accept="image/*">
-        <div *ngIf="imageUrl" class="image-preview">
-            <img [src]="imageUrl" alt="Prévia da imagem">
+    <div class="form-grid">
+      <div class="form-column">
+        <div class="form-field">
+          <label>Nome:</label>
+          <input type="text" formControlName="nome">
         </div>
+        <div class="form-field">
+          <label>Descrição:</label>
+          <textarea formControlName="descricao" rows="4"></textarea>
+        </div>
+        <div class="form-field">
+          <label>Preço:</label>
+          <input type="number" formControlName="preco">
+        </div>
+        <div class="form-field">
+          <label>Estoque:</label>
+          <input type="number" formControlName="estoque">
+        </div>
+        <div class="form-field">
+          <label>Fornecedor:</label>
+          <select formControlName="idFornecedor">
+            <option [ngValue]="null" disabled>Selecione um Fornecedor</option>
+            <option *ngFor="let fornecedor of fornecedores" [ngValue]="fornecedor.id">
+              {{ fornecedor.nome }}
+            </option>
+          </select>
+        </div>
+        <div class="form-field">
+            <label>Material:</label>
+            <select formControlName="idMaterial">
+              <option [ngValue]="null" disabled>Selecione o Material</option>
+              <option *ngFor="let material of materiais" [ngValue]="material.id">
+                {{ material.nome }}
+              </option>
+            </select>
+          </div>
+      </div>
+      
+      <div class="form-column">
+        <div class="form-field">
+            <label for="imagem">Capa do Quadrinho</label>
+            <input type="file" id="imagem" (change)="onFileSelected($event)" accept="image/png, image/jpeg">
+            <div *ngIf="imagePreview" class="image-preview">
+                <img [src]="imagePreview" alt="Prévia da capa">
+            </div>
+        </div>
+      </div>
     </div>
 
     <div class="form-actions">

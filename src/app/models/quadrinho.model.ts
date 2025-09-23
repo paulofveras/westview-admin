@@ -1,3 +1,4 @@
+import { Material } from "./material.model";
 import { Fornecedor } from "./pessoa.model";
 
 // Esta interface representa um objeto Quadrinho como ele vem do back-end.
@@ -9,4 +10,6 @@ export interface Quadrinho {
     preco: number;
     estoque: number;
     fornecedor: Fornecedor;
+    material: Material
+    nomeImagem: string; // Nome do arquivo de imagem associado ao quadrinho
 }

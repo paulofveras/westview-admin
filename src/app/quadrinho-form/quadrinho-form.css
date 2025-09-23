@@ -79,3 +79,19 @@
   border-radius: 4px;
   border: 1px solid var(--border-color);
 }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Duas colunas, a primeira com o dobro do tamanho */
+  gap: 30px;
+}
+
+.image-preview img {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  margin-top: 10px;
+}
