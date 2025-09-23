@@ -7,11 +7,23 @@ import { FuncionarioFormComponent } from './funcionario-form/funcionario-form';
 import { FornecedorListComponent } from './fornecedor-list/fornecedor-list';
 import { LoginComponent } from './login/login.component';
 import { authGuard } from './guards/auth.guards';
+import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard';
+import { quadrinhoResolver } from './resolvers/quadrinho.resolver';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/quadrinhos', pathMatch: 'full' },
-  { path: 'login', component: LoginComponent },
-  { path: 'cadastro', component: ClienteFormComponent },
+    { path: 'cadastro', component: ClienteFormComponent },    
+    { path: 'login', component: LoginComponent },
+    // Redirecionamento principal agora aponta para o novo dashboard
+    { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+
+    // Nova rota para o dashboard
+    { 
+      path: 'dashboard', 
+      component: AdminDashboardComponent,
+      canActivate: [authGuard],
+      data: { roles: ['Funcionario'] }
+    },
+
   
   // Rotas protegidas
     { 
@@ -20,8 +32,16 @@ export const routes: Routes = [
         data: { roles: ['Funcionario'] },
         children: [
             { path: 'list', component: QuadrinhoListComponent },
+            // Rota para novo quadrinho
             { path: 'new', component: QuadrinhoFormComponent },
-            { path: 'edit/:id', component: QuadrinhoFormComponent }
+            // Rota de edição agora usa o resolver
+            { 
+              path: 'edit/:id', 
+              component: QuadrinhoFormComponent,
+              // O Angular vai executar 'quadrinhoResolver' e disponibilizar o resultado
+              // na propriedade 'quadrinho' dos dados da rota.
+              resolve: { quadrinho: quadrinhoResolver } 
+            }
         ]
     },
 

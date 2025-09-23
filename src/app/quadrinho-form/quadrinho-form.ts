@@ -17,12 +17,10 @@ import { AuthService } from '../services/auth.service';
 })
 export class QuadrinhoFormComponent implements OnInit {
 
-  // Adicionando as propriedades que estavam faltando no seu .ts
-  formGroup: FormGroup; // O nome correto que estamos usando é 'formGroup'
+  formGroup: FormGroup;
   isEditMode: boolean = false;
   fornecedores: Fornecedor[] = [];
   
-  // Propriedades para upload de imagem
   selectedFile: File | null = null;
   imageUrl: string | ArrayBuffer | null = null;
 
@@ -33,18 +31,21 @@ export class QuadrinhoFormComponent implements OnInit {
               private activatedRoute: ActivatedRoute,
               private authService: AuthService) {
 
+    // Pegamos o objeto 'quadrinho' que o nosso resolver preparou.
     const quadrinho: Quadrinho = this.activatedRoute.snapshot.data['quadrinho'];
-    
-    // Define se estamos no modo de edição
+
+    // Se o quadrinho tem um ID, então estamos no modo de edição.
     this.isEditMode = (quadrinho && quadrinho.id) ? true : false;
 
     this.formGroup = formBuilder.group({
-      id: [(quadrinho && quadrinho.id) ? quadrinho.id : null],
-      nome: [(quadrinho && quadrinho.nome) ? quadrinho.nome : '', Validators.required],
-      descricao: [(quadrinho && quadrinho.descricao) ? quadrinho.descricao : '', Validators.required],
-      preco: [(quadrinho && quadrinho.preco) ? quadrinho.preco : '', Validators.required],
-      estoque: [(quadrinho && quadrinho.estoque) ? quadrinho.estoque : '', Validators.required],
-      idFornecedor: [(quadrinho && quadrinho.fornecedor) ? quadrinho.fornecedor.id : null, Validators.required]
+      // Populamos o formulário com os dados do 'quadrinho' resolvido.
+      id: [quadrinho?.id],
+      nome: [quadrinho?.nome, Validators.required],
+      descricao: [quadrinho?.descricao, Validators.required],
+      preco: [quadrinho?.preco, Validators.required],
+      estoque: [quadrinho?.estoque, Validators.required],
+      // No modo de edição, o ID do fornecedor já vem pré-selecionado.
+      idFornecedor: [quadrinho?.fornecedor?.id, Validators.required]
     });
   }
 
@@ -62,13 +63,13 @@ export class QuadrinhoFormComponent implements OnInit {
   salvar() {
     if (this.formGroup.valid) {
       const quadrinho = this.formGroup.value;
-      const operacao = quadrinho.id == null 
-        ? this.quadrinhoService.save(quadrinho)
-        : this.quadrinhoService.update(quadrinho);
+      const operacao = this.isEditMode
+        ? this.quadrinhoService.update(quadrinho)
+        : this.quadrinhoService.save(quadrinho);
 
       operacao.subscribe({
         next: () => {
-          this.router.navigateByUrl('/quadrin hos/list');
+          this.router.navigateByUrl('/quadrinhos/list');
         },
         error: (err) => {
           console.log('Erro ao salvar' + JSON.stringify(err));
@@ -78,8 +79,8 @@ export class QuadrinhoFormComponent implements OnInit {
   }
 
   excluir() {
-    const quadrinho = this.formGroup.value;
-    if (quadrinho.id != null) {
+    if (this.isEditMode) {
+      const quadrinho = this.formGroup.value;
       this.quadrinhoService.delete(quadrinho).subscribe({
         next: () => {
           this.router.navigateByUrl('/quadrinhos/list');
@@ -91,7 +92,6 @@ export class QuadrinhoFormComponent implements OnInit {
     }
   }
 
-  // Método para lidar com a seleção de arquivo
   onFileSelected(event: any): void {
     this.selectedFile = event.target.files[0];
     if (this.selectedFile) {

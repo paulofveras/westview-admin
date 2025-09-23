@@ -1,10 +1,13 @@
 <header>
-  <h1>Westview Admin</h1>
+  <a routerLink="/dashboard" class="header-title-link">
+    <h1>Westview Admin</h1>
+  </a>
+
   <nav *ngIf="authService.isLoggedIn() && authService.isFuncionario()">
     <ul>
       <li><a routerLink="/quadrinhos/list">Quadrinhos</a></li>
       <li><a routerLink="/fornecedores/list">Fornecedores</a></li>
-      </ul>
+    </ul>
     <button (click)="logout()" class="btn-logout">Sair</button>
   </nav>
 </header>

@@ -1,0 +1,73 @@
+header {
+  background-color: var(--header-bg-color);
+  color: var(--text-light-color);
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px var(--shadow-color);
+}
+
+/* --- INÍCIO DA ALTERAÇÃO --- */
+.header-title-link {
+  text-decoration: none; /* Remove o sublinhado do link */
+  color: inherit; /* Faz o link herdar a cor do elemento pai (branco) */
+}
+
+.header-title-link h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+/* --- FIM DA ALTERAÇÃO --- */
+
+nav {
+  display: flex;
+  align-items: center;
+}
+
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+nav ul li {
+  margin-left: 20px;
+}
+
+nav ul li a {
+  color: var(--text-light-color);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+nav ul li a:hover,
+nav ul li a.active {
+  background-color: var(--primary-color);
+}
+
+.btn-logout {
+  margin-left: 30px;
+  background-color: var(--primary-color);
+  color: var(--text-light-color);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.btn-logout:hover {
+  background-color: var(--primary-color-hover);
+}
+
+main {
+  padding: 20px;
+}

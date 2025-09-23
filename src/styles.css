@@ -1,34 +1,86 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-/* Adicione essas variáveis ao início do seu arquivo src/styles.css */
+/* Estilos Globais */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
 :root {
-  /* Cores principais */
-  --cor-primaria-vermelho: #d00000;
-  --cor-secundaria-vermelho: #dc2626;
-  --cor-magia-rosa: #ff0f7b;
-  
-  /* Cores de texto */
-  --cor-texto-principal: #ffffff;
-  --cor-texto-secundario: #cccccc;
-  
-  /* Cores de superfície e fundo */
-  --cor-superficie: #2c2c2c;
-  --cor-fundo: #1a1a1a;
-  --cor-borda: #444444;
+  /* Paleta de Cores Westview */
+  --background-color: #f4f4f8;
+  --container-bg-color: #ffffff;
+  --header-bg-color: #2c2c2c;
+  --primary-color: #e63946; /* Vermelho Wanda */
+  --primary-color-hover: #d62839;
+  --danger-color: #c00010;
+  --danger-color-hover: #a0000d;
+  --secondary-color: #6c757d;
+  --secondary-color-hover: #5a6268;
+  --text-color: #333333;
+  --text-light-color: #ffffff;
+  --border-color: #dee2e6;
+  --shadow-color: rgba(0, 0, 0, 0.1);
 }
 
-/* Reset básico */
-* {
+body, html {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
-body {
-  font-family: 'Poppins', sans-serif;
-  background: var(--cor-fundo);
-  color: var(--cor-texto-principal);
-  line-height: 1.6;
-  min-height: 100vh;
+/* Estilos de Botões Globais */
+.btn-primary {
+  padding: 10px 20px;
+  background-color: var(--primary-color);
+  color: var(--text-light-color);
+  text-decoration: none;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
 }
 
+.btn-primary:hover {
+  background-color: var(--primary-color-hover);
+}
+
+.btn-primary:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.btn-danger {
+  padding: 10px 20px;
+  background-color: var(--danger-color);
+  color: var(--text-light-color);
+  text-decoration: none;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.btn-danger:hover {
+    background-color: var(--danger-color-hover);
+}
+
+.btn-secondary {
+  padding: 10px 20px;
+  background-color: var(--secondary-color);
+  color: var(--text-light-color);
+  text-decoration: none;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: var(--secondary-color-hover);
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 14px;
+}
