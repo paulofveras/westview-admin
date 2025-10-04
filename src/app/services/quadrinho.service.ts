@@ -1,7 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Quadrinho } from '../models/quadrinho.model';
+import { PageResult } from '../models/page-result.model';
 
 @Injectable({
   providedIn: 'root'
@@ -51,4 +52,22 @@ export class QuadrinhoService {
   }
 
   // --- FIM DAS NOVAS FUNÇÕES ---
+
+    // --- NOVOS ---
+
+  // Contador total ou filtrado (depende de q)
+  count(q?: string): Observable<number> {
+    let params = new HttpParams();
+    if (q) params = params.set('q', q);
+    return this.http.get<number>(`${this.baseURL}/quadrinhos/count`, { params });
+  }
+
+  // Lista paginada completa (JSON com page/pageSize/total/filtered/data)
+  findPaged(page = 0, pageSize = 12, q = ''): Observable<PageResult<Quadrinho>> {
+    let params = new HttpParams()
+      .set('page', String(page))
+      .set('pageSize', String(pageSize));
+    if (q) params = params.set('q', q);
+    return this.http.get<PageResult<Quadrinho>>(`${this.baseURL}/quadrinhos/paged`, { params });
+  }
 }

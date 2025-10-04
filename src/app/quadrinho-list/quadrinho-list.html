@@ -1,8 +1,21 @@
 <div class="table-container">
-    <div class="table-header">
-      <h2>Lista de Quadrinhos</h2>
-      <a *ngIf="authService.isFuncionario()" routerLink="/quadrinhos/new" class="btn-primary">Novo Quadrinho</a>
+  
+        <div class="search-row">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Pesquisar por nome ou descrição</mat-label>
+        <input matInput [(ngModel)]="q" (keyup.enter)="pesquisar()" />
+        <mat-icon matPrefix>search</mat-icon>
+        <button *ngIf="q" mat-icon-button matSuffix aria-label="Limpar" (click)="q=''; pesquisar()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" (click)="pesquisar()">
+        <mat-icon>search</mat-icon>
+        Pesquisar
+      </button>
     </div>
+
   
     <table>
       <thead>
@@ -33,4 +46,15 @@
         </tr>
       </tbody>
     </table>
+
+      <!-- >>> AQUI FICA O PAGINATOR (logo abaixo da tabela) -->
+  <mat-paginator
+    [length]="length"
+    [pageIndex]="page"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[6, 12, 24, 48]"
+    (page)="paginar($event)">
+  </mat-paginator>
+
+
   </div>

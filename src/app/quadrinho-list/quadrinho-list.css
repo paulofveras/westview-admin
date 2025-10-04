@@ -66,3 +66,24 @@ td .btn-danger {
   border-radius: 4px;
   object-fit: cover;
 }
+
+.search-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end; /* mude para flex-end se quiser à direita */
+  margin: 8px 0 20px;
+}
+
+.search-field {
+  flex: 1;
+  max-width: 420px; /* aumenta/diminui conforme seu gosto */
+}
+
+/* harmoniza os mat-buttons com suas classes, opcional */
+.mat-mdc-raised-button.mat-primary {
+  background-color: #dc3545;   /* tom do seu "Novo Quadrinho"/Excluir */
+}
+.mat-mdc-raised-button.mat-primary:hover {
+  filter: brightness(0.95);
+}
