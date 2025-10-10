@@ -1,89 +1,150 @@
-.table-container {
-  margin: 20px auto;
-  padding: 30px;
-  max-width: 1200px;
-  border-radius: 8px;
-  background-color: var(--container-bg-color);
-  box-shadow: 0 4px 8px var(--shadow-color);
-  overflow-x: auto; /* Garante que a tabela seja responsiva em telas menores */
+/* Usando variáveis para um tema consistente e inspirado em Westview */
+:host {
+  --primary-color: #c62828; /* Vermelho escuro, remetendo à WandaVision */
+  --primary-hover-color: #a31f1f;
+  --secondary-color: #6c757d;
+  --secondary-hover-color: #5a6268;
+  --danger-color: #b71c1c;
+  --danger-hover-color: #9e1515;
+  --container-bg-color: #ffffff;
+  --table-header-bg: #f8f9fa;
+  --table-hover-bg: #f1f3f5;
+  --text-color: #212529;
+  --text-light-color: #6c757d;
+  --border-color: #dee2e6;
+  --shadow-color: rgba(0, 0, 0, 0.08);
 }
 
+.table-container {
+  font-family: 'Roboto', sans-serif;
+  margin: 2.5rem auto;
+  padding: 2rem;
+  max-width: 1200px;
+  border-radius: 12px;
+  background-color: var(--container-bg-color);
+  box-shadow: 0 8px 25px var(--shadow-color);
+  overflow-x: auto;
+}
+
+/* --- Seção do Cabeçalho --- */
 .table-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .table-header h2 {
   margin: 0;
   color: var(--text-color);
+  font-size: 1.8rem;
+  font-weight: 500;
 }
 
+/* --- Seção da Busca --- */
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.search-field {
+  flex-grow: 1;
+}
+
+/* --- Estilos da Tabela --- */
 table {
   width: 100%;
   border-collapse: collapse;
 }
 
 th, td {
-  padding: 15px;
+  padding: 1rem 1.2rem;
   border-bottom: 1px solid var(--border-color);
   text-align: left;
   vertical-align: middle;
 }
 
 thead th {
-  background-color: #f8f9fa;
-  color: #495057;
+  background-color: var(--table-header-bg);
+  color: var(--text-light-color);
   font-weight: 600;
   text-transform: uppercase;
-  font-size: 0.85rem;
-  letter-spacing: 0.5px;
-}
-
-tbody tr:nth-child(even) {
-  background-color: #f8f9fa;
+  font-size: 0.8rem;
+  letter-spacing: 0.75px;
 }
 
 tbody tr:hover {
-  background-color: #e9ecef;
+  background-color: var(--table-hover-bg);
+  transition: background-color 0.2s ease;
 }
 
 td {
-    color: #666;
+  color: var(--text-color);
 }
 
-/* Estilo para os botões de ação na tabela */
-td .btn-secondary,
-td .btn-danger {
-    margin-right: 8px;
-}
-
-/* Adicione este código ao final do arquivo */
-.capa-quadrinho {
-  width: 60px;
-  height: auto;
-  border-radius: 4px;
-  object-fit: cover;
-}
-
-.search-row {
+td:last-child {
   display: flex;
-  gap: 12px;
+  gap: 0.5rem;
   align-items: center;
-  justify-content: flex-end; /* mude para flex-end se quiser à direita */
-  margin: 8px 0 20px;
 }
 
-.search-field {
-  flex: 1;
-  max-width: 420px; /* aumenta/diminui conforme seu gosto */
+/* --- Estilos do Paginador --- */
+mat-paginator {
+  margin-top: 2rem;
+  background-color: transparent;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1rem;
 }
 
-/* harmoniza os mat-buttons com suas classes, opcional */
-.mat-mdc-raised-button.mat-primary {
-  background-color: #dc3545;   /* tom do seu "Novo Quadrinho"/Excluir */
+/* --- Estilos Gerais de Botões --- */
+.btn-primary, .btn-secondary, .btn-danger, .btn-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  color: #fff;
+  white-space: nowrap;
 }
-.mat-mdc-raised-button.mat-primary:hover {
-  filter: brightness(0.95);
+
+.btn-primary:hover, .btn-secondary:hover, .btn-danger:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
 }
+
+.btn-primary {
+  background-color: var(--primary-color);
+}
+.btn-primary:hover {
+  background-color: var(--primary-hover-color);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+}
+.btn-secondary:hover {
+  background-color: var(--secondary-hover-color);
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+}
+.btn-danger:hover {
+  background-color: var(--danger-hover-color);
+}
+
+/* Botões pequenos para ações na tabela */
+.btn-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.875rem;
+}
+

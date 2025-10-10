@@ -15,6 +15,7 @@ import { CommonModule } from '@angular/common';
 export class FornecedorFormComponent {
 
   formGroup: FormGroup;
+  isEditMode: boolean = false;
 
   constructor(private formBuilder: FormBuilder,
               private fornecedorService: FornecedorService,
@@ -22,24 +23,25 @@ export class FornecedorFormComponent {
               private activatedRoute: ActivatedRoute) {
 
     const fornecedor: Fornecedor = this.activatedRoute.snapshot.data['fornecedor'];
+    this.isEditMode = !!(fornecedor && fornecedor.id); // Forma mais segura de verificar
 
-    // Estrutura do formulário agora espelha o DTO do backend
+    // Estrutura do formulário agora espelha o DTO do backend de forma segura
     this.formGroup = formBuilder.group({
-      id: [(fornecedor && fornecedor.id) ? fornecedor.id : null],
-      nome: [(fornecedor && fornecedor.nome) ? fornecedor.nome : '', Validators.required],
-      nomeFantasia: [(fornecedor && fornecedor.nomeFantasia) ? fornecedor.nomeFantasia : ''],
-      cnpj: [(fornecedor && fornecedor.cnpj) ? fornecedor.cnpj : '', Validators.required],
-      email: [(fornecedor && fornecedor.email) ? fornecedor.email : ''],
-      // Grupo para endereço
+      id: [fornecedor?.id || null],
+      nome: [fornecedor?.nome || '', Validators.required],
+      nomeFantasia: [fornecedor?.nomeFantasia || ''],
+      cnpj: [fornecedor?.cnpj || '', Validators.required],
+      email: [fornecedor?.email || ''],
+      // Grupo para endereço com verificação de existência
       endereco: formBuilder.group({
-        cep: [(fornecedor && fornecedor.endereco.cep) ? fornecedor.endereco.cep : '', Validators.required],
-        rua: [(fornecedor && fornecedor.endereco.rua) ? fornecedor.endereco.rua : '', Validators.required],
-        numero: [(fornecedor && fornecedor.endereco.numero) ? fornecedor.endereco.numero : '', Validators.required]
+        cep: [fornecedor?.endereco?.cep || '', Validators.required],
+        rua: [fornecedor?.endereco?.rua || '', Validators.required],
+        numero: [fornecedor?.endereco?.numero || '', Validators.required]
       }),
-      // Grupo para telefone
+      // Grupo para telefone com verificação de existência
       telefone: formBuilder.group({
-        codigoArea: [(fornecedor && fornecedor.telefone.codigoArea) ? fornecedor.telefone.codigoArea : '', Validators.required],
-        numero: [(fornecedor && fornecedor.telefone.numero) ? fornecedor.telefone.numero : '', Validators.required]
+        codigoArea: [fornecedor?.telefone?.codigoArea || '', Validators.required],
+        numero: [fornecedor?.telefone?.numero || '', Validators.required]
       })
     });
   }
@@ -47,33 +49,26 @@ export class FornecedorFormComponent {
   salvar() {
     if (this.formGroup.valid) {
       const fornecedor = this.formGroup.value;
-      if (fornecedor.id == null) {
-        this.fornecedorService.save(fornecedor).subscribe({
-          next: (fornecedorCadastrado) => {
-            this.router.navigateByUrl('/fornecedores/list');
-          },
-          error: (err) => {
-            console.log('Erro ao Incluir' + JSON.stringify(err));
-          }
-        });
-      } else {
-        this.fornecedorService.update(fornecedor).subscribe({
-          next: (fornecedorAlterado) => {
-            this.router.navigateByUrl('/fornecedores/list');
-          },
-          error: (err) => {
-            console.log('Erro ao Editar' + JSON.stringify(err));
-          }
-        });
-      }
+      const operacao = this.isEditMode
+        ? this.fornecedorService.update(fornecedor)
+        : this.fornecedorService.save(fornecedor);
+
+      operacao.subscribe({
+        next: () => {
+          this.router.navigateByUrl('/fornecedores/list');
+        },
+        error: (err) => {
+          console.log('Erro ao salvar: ' + JSON.stringify(err));
+        }
+      });
     }
   }
 
   excluir() {
-    if (this.formGroup.valid) {
+    if (this.isEditMode) {
       const fornecedor = this.formGroup.value;
-      if (fornecedor.id != null) {
-        this.fornecedorService.delete(fornecedor).subscribe({
+      if (confirm(`Tem certeza que deseja excluir o fornecedor "${fornecedor.nome}"?`)) {
+        this.fornecedorService.delete(fornecedor.id).subscribe({
           next: () => {
             this.router.navigateByUrl('/fornecedores/list');
           },

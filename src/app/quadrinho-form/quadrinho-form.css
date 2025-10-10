@@ -1,43 +1,72 @@
+/* --- Variáveis de Tema (Consistente com a Lista) --- */
+:host {
+  --primary-color: #c62828;
+  --primary-hover-color: #a31f1f;
+  --secondary-color: #6c757d;
+  --secondary-hover-color: #5a6268;
+  --danger-color: #b71c1c;
+  --danger-hover-color: #9e1515;
+  --container-bg-color: #ffffff;
+  --text-color: #212529;
+  --text-light-color: #6c757d;
+  --border-color: #dee2e6;
+  --input-focus-color: rgba(198, 40, 40, 0.25);
+  --shadow-color: rgba(0, 0, 0, 0.08);
+  --card-bg-color: #f8f9fa;
+}
+
+/* --- Container Principal do Formulário --- */
 .form-container {
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 30px;
+  font-family: 'Roboto', sans-serif;
+  max-width: 900px;
+  margin: 2.5rem auto;
+  padding: 2.5rem;
   background-color: var(--container-bg-color);
-  border-radius: 8px;
-  box-shadow: 0 4px 8px var(--shadow-color);
+  border-radius: 12px;
+  box-shadow: 0 8px 25px var(--shadow-color);
 }
 
 .form-container h2 {
   text-align: center;
-  margin-bottom: 25px;
+  margin-bottom: 2.5rem;
+  font-size: 2rem;
+  font-weight: 500;
   color: var(--text-color);
 }
 
+/* --- Layout em Grid (Campos de Dados | Imagem) --- */
 .form-grid {
   display: grid;
-  gap: 20px;
+  grid-template-columns: 2fr 1fr;
+  gap: 2.5rem;
 }
 
+/* --- Estilo dos Campos do Formulário --- */
 .form-field {
   display: flex;
   flex-direction: column;
+  margin-bottom: 1.5rem;
 }
 
 .form-field label {
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #555;
+  color: var(--text-light-color);
+  font-size: 0.9rem;
 }
 
-.form-field input,
+.form-field input[type="text"],
+.form-field input[type="number"],
 .form-field textarea,
 .form-field select {
   width: 100%;
-  padding: 12px;
+  padding: 0.8rem 1rem;
   border: 1px solid var(--border-color);
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 1rem;
-  box-sizing: border-box; /* Garante que o padding não aumente a largura */
+  box-sizing: border-box;
+  background-color: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .form-field input:focus,
@@ -45,53 +74,100 @@
 .form-field select:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.2);
+  box-shadow: 0 0 0 3px var(--input-focus-color);
 }
 
-.fieldset-group {
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    padding: 20px;
-    margin-top: 10px;
+textarea {
+  resize: vertical;
+  min-height: 100px;
 }
 
-.fieldset-group legend {
-    padding: 0 10px;
-    font-weight: 500;
-    color: var(--primary-color);
-}
-
-.form-actions {
+/* --- Card de Upload da Imagem --- */
+.image-upload-card {
+  background-color: var(--card-bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
   display: flex;
-  justify-content: flex-end;
-  gap: 15px;
-  margin-top: 20px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.image-upload-card label {
+  font-weight: 500;
+  color: var(--text-color);
+  margin-bottom: 1rem;
 }
 
 .image-preview {
-  margin-top: 15px;
-  text-align: center;
-}
-
-.image-preview img {
-  max-width: 200px;
-  max-height: 200px;
-  border-radius: 4px;
-  border: 1px solid var(--border-color);
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr; /* Duas colunas, a primeira com o dobro do tamanho */
-  gap: 30px;
+  margin-top: 1rem;
+  width: 100%;
+  max-width: 250px;
 }
 
 .image-preview img {
   width: 100%;
   height: auto;
-  max-height: 400px;
-  object-fit: contain;
-  border-radius: 4px;
-  border: 1px solid var(--border-color);
-  margin-top: 10px;
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  object-fit: cover;
 }
+
+input[type="file"] {
+  border: 1px dashed var(--primary-color);
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-light-color);
+  font-size: 0.9rem;
+  width: 100%;
+  transition: background-color 0.2s ease;
+}
+
+input[type="file"]:hover {
+  background-color: #e9ecef;
+}
+
+/* --- Botões de Ação --- */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn-primary, .btn-secondary, .btn-danger {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  color: #fff;
+}
+
+.btn-primary:hover, .btn-secondary:hover, .btn-danger:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.btn-primary { background-color: var(--primary-color); }
+.btn-primary:hover { background-color: var(--primary-hover-color); }
+.btn-primary:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-secondary { background-color: var(--secondary-color); }
+.btn-secondary:hover { background-color: var(--secondary-hover-color); }
+
+.btn-danger { background-color: var(--danger-color); }
+.btn-danger:hover { background-color: var(--danger-hover-color); }

@@ -7,12 +7,16 @@ import { Material } from '../models/material.model';
   providedIn: 'root'
 })
 export class MaterialService {
-  private baseURL: string = 'http://localhost:8080';
+  private baseURL: string = 'http://localhost:8080/materiais';
 
   constructor(private http: HttpClient) {}
 
+  // CORREÇÃO: Alterado de Observable<Material> para Observable<Material[]>
   findAll(): Observable<Material[]> {
-    // Este endpoint deve corresponder ao seu MaterialResource no backend
-    return this.http.get<Material[]>(`${this.baseURL}/materiais`);
+    return this.http.get<Material[]>(`${this.baseURL}`);
+  }
+
+  findById(id: string): Observable<Material> {
+    return this.http.get<Material>(`${this.baseURL}/${id}`);
   }
 }

@@ -1,4 +1,6 @@
 <div class="form-container">
+  <h2 *ngIf="isEditMode; else createTitle">Editando Fornecedor</h2>
+  <ng-template #createTitle><h2>Novo Fornecedor</h2></ng-template>
   <form [formGroup]="formGroup" class="form-grid">
     <div class="form-field">
       <label>Razão Social:</label>
