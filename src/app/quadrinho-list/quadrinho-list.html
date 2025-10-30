@@ -1,63 +1,126 @@
-<div class="table-container">
-  
-    <div class="table-header">
-        <h2>Lista de Quadrinhos</h2>
-        <a *ngIf="authService.isFuncionario()" routerLink="/quadrinhos/new" class="btn-primary">Adicionar Quadrinho</a>
-    </div>
+<div class="catalog-page">
+    <section class="hero">
+        <div class="hero-content">
+            <span class="eyebrow">Coleção exclusiva Westview Comics</span>
+            <h2>Descubra seu próximo quadrinho favorito</h2>
+            <p>
+                Explore uma curadoria de HQs com estoque atualizado em tempo real. Pesquise por nome ou descrição e use a paginação para navegar com facilidade pelo catálogo completo.
+            </p>
+            <div class="hero-actions">
+                <a *ngIf="authService.isFuncionario()" routerLink="/quadrinhos/new" class="btn-primary">
+                    <mat-icon>add</mat-icon>
+                    Novo produto
+                </a>
+                <button mat-stroked-button color="primary" (click)="pesquisar()">
+                    <mat-icon>refresh</mat-icon>
+                    Atualizar lista
+                </button>
+            </div>
+        </div>
+        <div class="hero-highlight">
+            <div class="hero-card">
+                <span class="highlight-label">Catálogo</span>
+                <strong>{{ length | number:'1.0-0' }}</strong>
+                <small>Quadrinhos disponíveis</small>
+                <mat-chip-set aria-label="Resumo do catálogo">
+                    <mat-chip *ngIf="pageSize" color="primary" selected>Página {{ page + 1 }}</mat-chip>
+                    <mat-chip *ngIf="q">Filtro: "{{ q }}"</mat-chip>
+                    <mat-chip *ngIf="!q">Sem filtros ativos</mat-chip>
+                </mat-chip-set>
+            </div>
+        </div>
+    </section>
 
-    <div class="search-row">
+    <section class="filters">
         <mat-form-field appearance="outline" class="search-field">
             <mat-label>Pesquisar por nome ou descrição</mat-label>
-            <input matInput [(ngModel)]="q" (keyup.enter)="pesquisar()" />
+            <input matInput [(ngModel)]="q" (keyup.enter)="pesquisar()" placeholder="Busque por título, editora, personagem..." />
             <mat-icon matPrefix>search</mat-icon>
             <button *ngIf="q" mat-icon-button matSuffix aria-label="Limpar" (click)="q=''; pesquisar()">
                 <mat-icon>close</mat-icon>
             </button>
         </mat-form-field>
-
         <button mat-raised-button color="primary" (click)="pesquisar()">
             <mat-icon>search</mat-icon>
             Pesquisar
         </button>
-    </div>
+    </section>
 
-  
-    <table>
-      <thead>
-        <tr>
-          <th>Capa</th>
-          <th>ID</th>
-          <th>Nome</th>
-          <th>Preço</th>
-          <th>Estoque</th>
-          <th>Fornecedor</th>
-          <th *ngIf="authService.isFuncionario()">Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let quadrinho of quadrinhos">
-          <td>
-            <img [src]="getImageUrl(quadrinho.nomeImagem)" alt="Capa de {{quadrinho.nome}}" class="capa-quadrinho">
-          </td>
-          <td>{{ quadrinho.id }}</td>
-          <td>{{ quadrinho.nome }}</td>
-          <td>{{ quadrinho.preco | currency:'BRL' }}</td>
-          <td>{{ quadrinho.estoque }}</td>
-          <td>{{ quadrinho.fornecedor.nome }}</td>
-          <td *ngIf="authService.isFuncionario()">
-            <a [routerLink]="['/quadrinhos/edit', quadrinho.id]" class="btn-sm btn-secondary">Editar</a>
-            <button (click)="excluir(quadrinho)" class="btn-sm btn-danger">Excluir</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <section class="catalog-summary" *ngIf="quadrinhos.length; else emptyState">
+        <header class="catalog-header">
+            <div>
+                <h3>Produtos em destaque</h3>
+                <p *ngIf="q; else totalInfo">Exibindo resultados filtrados por "{{ q }}".</p>
+                <ng-template #totalInfo>
+                    <p>Exibindo {{ quadrinhos.length }} de {{ length | number:'1.0-0' }} produtos.</p>
+                </ng-template>
+            </div>
+            <span class="page-size">{{ pageSize }} itens por página</span>
+        </header>
 
-      <mat-paginator
-    [length]="length"
-    [pageIndex]="page"
-    [pageSize]="pageSize"
-    [pageSizeOptions]="[6, 12, 24, 48]"
-    (page)="paginar($event)">
-  </mat-paginator>
+        <div class="catalog-grid">
+            <mat-card class="product-card" *ngFor="let quadrinho of quadrinhos">
+                <div class="card-media">
+                    <img [src]="getImageUrl(quadrinho.nomeImagem)" alt="Capa de {{ quadrinho.nome }}" loading="lazy" (error)="onImageError($event)" />
+                    <span class="stock-badge" [ngClass]="{ 'low': quadrinho.estoque < 10 }">
+                        {{ quadrinho.estoque > 0 ? (quadrinho.estoque + ' em estoque') : 'Indisponível' }}
+                    </span>
+                </div>
+                <mat-card-header>
+                    <div mat-card-avatar class="avatar">
+                        <mat-icon>menu_book</mat-icon>
+                    </div>
+                    <mat-card-title>{{ quadrinho.nome }}</mat-card-title>
+                    <mat-card-subtitle>{{ quadrinho.fornecedor?.nome || 'Fornecedor não informado' }}</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                    <p class="description" [matTooltip]="quadrinho.descricao">
+                        {{ quadrinho.descricao || 'Sem descrição disponível.' }}
+                    </p>
+                    <div class="price-row">
+                        <span class="price">{{ quadrinho.preco | currency:'BRL':'symbol-narrow' }}</span>
+                        <span class="installment">ou 6x de {{ (quadrinho.preco / 6) | currency:'BRL':'symbol-narrow':'1.2-2' }}</span>
+                    </div>
+                    <mat-chip-set aria-label="Informações complementares" class="features">
+                        <mat-chip color="primary" selected>Material: {{ quadrinho.material?.nome || 'N/D' }}</mat-chip>
+                        <mat-chip>Fornecedor: {{ quadrinho.fornecedor?.nome || 'N/D' }}</mat-chip>
+                        <mat-chip>Páginas: {{ quadrinho.quantPaginas ?? 'N/D' }}</mat-chip>
+                    </mat-chip-set>
+                </mat-card-content>
+                <mat-card-actions align="end">
+                    <button mat-stroked-button color="primary">
+                        <mat-icon>shopping_cart</mat-icon>
+                        Ver detalhes
+                    </button>
+                    <button *ngIf="authService.isFuncionario()" mat-flat-button color="primary" [routerLink]="['/quadrinhos/edit', quadrinho.id]">
+                        <mat-icon>edit</mat-icon>
+                        Editar
+                    </button>
+                    <button *ngIf="authService.isFuncionario()" mat-stroked-button color="warn" (click)="excluir(quadrinho)">
+                        <mat-icon>delete</mat-icon>
+                        Excluir
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+    </section>
 
+    <ng-template #emptyState>
+        <div class="empty-state">
+            <mat-icon>sentiment_dissatisfied</mat-icon>
+            <h3>Nenhum quadrinho encontrado</h3>
+            <p>Tente ajustar os filtros de busca ou limpe o campo de pesquisa.</p>
+            <button mat-raised-button color="primary" (click)="q=''; pesquisar()">
+                Limpar filtros
+            </button>
+        </div>
+    </ng-template>
+
+    <mat-paginator
+        [length]="length"
+        [pageIndex]="page"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[6, 12, 24, 48]"
+        (page)="paginar($event)">
+    </mat-paginator>
 </div>
