@@ -15,6 +15,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-quadrinho-list',
@@ -27,7 +30,10 @@ import { MatInputModule } from '@angular/material/input';
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    MatCardModule,
+    MatChipsModule,
+    MatTooltipModule
   ],
   templateUrl: './quadrinho-list.html',
   styleUrls: ['./quadrinho-list.css'],
@@ -38,6 +44,7 @@ import { MatInputModule } from '@angular/material/input';
 export class QuadrinhoListComponent implements OnInit {
 
   quadrinhos: Quadrinho[] = [];
+  readonly placeholderImage = 'assets/images/placeholder-comic.svg';
 
   // >>> CONTROLES DE PAGINAÇÃO/PESQUISA
   page = 0;
@@ -73,8 +80,16 @@ paginar(event: PageEvent): void {
   this.load();
 }
 
-  getImageUrl(nomeImagem: string): string {
+  getImageUrl(nomeImagem?: string | null): string {
+    if (!nomeImagem) {
+      return this.placeholderImage;
+    }
     return this.quadrinhoService.getImageUrl(nomeImagem);
+  }
+
+  onImageError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    target.src = this.placeholderImage;
   }
 
   excluir(quadrinho: Quadrinho): void {

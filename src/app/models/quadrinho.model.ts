@@ -9,7 +9,8 @@ export interface Quadrinho {
     descricao: string;
     preco: number;
     estoque: number;
-    fornecedor: Fornecedor;
-    material: Material
+    fornecedor?: Fornecedor | null;
+    material?: Material | null;
+    quantPaginas?: number;
     nomeImagem: string; // Nome do arquivo de imagem associado ao quadrinho
 }

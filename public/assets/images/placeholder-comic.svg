@@ -1,0 +1,29 @@
+<svg width="640" height="800" viewBox="0 0 640 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1f1b2e" />
+      <stop offset="1" stop-color="#451f3d" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffb300" stop-opacity="0.8" />
+      <stop offset="1" stop-color="#ff7043" stop-opacity="0.9" />
+    </linearGradient>
+  </defs>
+  <rect width="640" height="800" rx="24" fill="url(#bg)" />
+  <g opacity="0.45">
+    <circle cx="120" cy="160" r="120" fill="#ffffff" fill-opacity="0.08" />
+    <circle cx="520" cy="220" r="160" fill="#ffffff" fill-opacity="0.08" />
+    <circle cx="340" cy="620" r="140" fill="#ffffff" fill-opacity="0.06" />
+  </g>
+  <rect x="80" y="140" width="480" height="320" rx="18" stroke="url(#accent)" stroke-width="4" fill="#ffffff" fill-opacity="0.06" />
+  <rect x="120" y="540" width="400" height="32" rx="16" fill="#ffffff" fill-opacity="0.18" />
+  <rect x="120" y="600" width="300" height="18" rx="9" fill="#ffffff" fill-opacity="0.18" />
+  <rect x="120" y="640" width="260" height="18" rx="9" fill="#ffffff" fill-opacity="0.12" />
+  <g transform="translate(180 220)">
+    <path d="M60 0L120 36V108L60 144L0 108V36L60 0Z" fill="#ffffff" fill-opacity="0.18" />
+    <path d="M60 24L96 45V99L60 120L24 99V45L60 24Z" fill="url(#accent)" fill-opacity="0.75" />
+    <path d="M60 54L78 64.5V94.5L60 105L42 94.5V64.5L60 54Z" fill="#ffffff" fill-opacity="0.85" />
+  </g>
+  <text x="320" y="500" text-anchor="middle" font-family="'Montserrat', 'Roboto', sans-serif" font-size="36" font-weight="600" fill="#ffffff" fill-opacity="0.85">Capa indisponível</text>
+  <text x="320" y="690" text-anchor="middle" font-family="'Roboto', sans-serif" font-size="20" fill="#ffffff" fill-opacity="0.65">Imagem será exibida automaticamente</text>
+</svg>
