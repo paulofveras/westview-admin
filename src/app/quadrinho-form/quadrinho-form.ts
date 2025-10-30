@@ -48,9 +48,9 @@ export class QuadrinhoFormComponent implements OnInit {
       descricao: [quadrinho?.descricao, Validators.required],
       preco: [quadrinho?.preco, Validators.required],
       estoque: [quadrinho?.estoque, Validators.required],
-      idFornecedor: [quadrinho?.fornecedor?.id, Validators.required],
+      idFornecedor: [quadrinho?.fornecedor?.id ?? null, Validators.required],
       // Adicione o campo de material ao formulário
-      idMaterial: [quadrinho?.material?.id, Validators.required] 
+      idMaterial: [quadrinho?.material?.id ?? null, Validators.required]
     });
   }
 
@@ -73,7 +73,12 @@ export class QuadrinhoFormComponent implements OnInit {
   // O método salvar permanece o mesmo, pois o formGroup já inclui o idMaterial
   salvar() {
     if (this.formGroup.valid) {
-      const quadrinho = this.formGroup.value;
+      const formValue = this.formGroup.value;
+      const quadrinho = {
+        ...formValue,
+        idFornecedor: formValue.idFornecedor != null ? Number(formValue.idFornecedor) : null,
+        idMaterial: formValue.idMaterial != null ? Number(formValue.idMaterial) : null
+      };
       const operacao = this.isEditMode
         ? this.quadrinhoService.update(quadrinho)
         : this.quadrinhoService.save(quadrinho);
