@@ -34,7 +34,7 @@ export const quadrinhoResolver: ResolveFn<Quadrinho> =
          
       },
       nomeImagem: '', // Propriedade que estava faltando
-      material: {id:0, nome:''}
+      material: null
     });
 
     // --- FIM DA CORREÇÃO ---
