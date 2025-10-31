@@ -1,16 +1,28 @@
 <div class="catalog-page">
     <section class="hero">
         <div class="hero-content">
-            <span class="eyebrow">Coleção exclusiva Westview Comics</span>
-            <h2>Descubra seu próximo quadrinho favorito</h2>
-            <p>
-                Explore uma curadoria de HQs com estoque atualizado em tempo real. Pesquise por nome ou descrição e use a paginação para navegar com facilidade pelo catálogo completo.
+            <span class="eyebrow" *ngIf="isPublicView; else adminEyebrow">Bem-vindo à Westview Comics</span>
+            <ng-template #adminEyebrow><span class="eyebrow">Área administrativa</span></ng-template>
+            <h2 *ngIf="isPublicView; else adminTitle">Descubra seu próximo quadrinho favorito</h2>
+            <ng-template #adminTitle><h2>Gerencie o catálogo de quadrinhos</h2></ng-template>
+            <p *ngIf="isPublicView; else adminCopy">
+                Explore nossa vitrine de HQs e encontre aquela edição especial para a sua coleção. Navegue livremente, sem precisar de cadastro.
             </p>
+            <ng-template #adminCopy>
+                <p>
+                    Mantenha o catálogo sempre atualizado. Pesquise, edite ou remova produtos e acompanhe o estoque em tempo real.
+                </p>
+            </ng-template>
             <div class="hero-actions">
-                <a *ngIf="authService.isFuncionario()" routerLink="/quadrinhos/new" class="btn-primary">
+                <a *ngIf="!isPublicView && authService.isFuncionario()" routerLink="/quadrinhos/new" class="btn-primary">
                     <mat-icon>add</mat-icon>
                     Novo produto
                 </a>
+                <button *ngIf="isPublicView" mat-flat-button color="accent" routerLink="/carrinho">
+                    <mat-icon>shopping_cart</mat-icon>
+                    Ver carrinho
+                    <span *ngIf="cartCount > 0">({{ cartCount }})</span>
+                </button>
                 <button mat-stroked-button color="primary" (click)="pesquisar()">
                     <mat-icon>refresh</mat-icon>
                     Atualizar lista
@@ -61,7 +73,7 @@
         <div class="catalog-grid">
             <mat-card class="product-card" *ngFor="let quadrinho of quadrinhos">
                 <div class="card-media">
-                    <img [src]="getImageUrl(quadrinho.nomeImagem)" alt="Capa de {{ quadrinho.nome }}" loading="lazy" (error)="onImageError($event)" />
+                    <img [src]="getImageSrc(quadrinho)" alt="Capa de {{ quadrinho.nome }}" loading="lazy" (error)="onImageError($event)" />
                     <span class="stock-badge" [ngClass]="{ 'low': quadrinho.estoque < 10 }">
                         {{ quadrinho.estoque > 0 ? (quadrinho.estoque + ' em estoque') : 'Indisponível' }}
                     </span>
@@ -92,11 +104,15 @@
                         <mat-icon>shopping_cart</mat-icon>
                         Ver detalhes
                     </button>
-                    <button *ngIf="authService.isFuncionario()" mat-flat-button color="primary" [routerLink]="['/quadrinhos/edit', quadrinho.id]">
+                    <button *ngIf="isPublicView" mat-flat-button color="accent" (click)="adicionarAoCarrinho(quadrinho)">
+                        <mat-icon>add_shopping_cart</mat-icon>
+                        Adicionar ao carrinho
+                    </button>
+                    <button *ngIf="!isPublicView && authService.isFuncionario()" mat-flat-button color="primary" [routerLink]="['/quadrinhos/edit', quadrinho.id]">
                         <mat-icon>edit</mat-icon>
                         Editar
                     </button>
-                    <button *ngIf="authService.isFuncionario()" mat-stroked-button color="warn" (click)="excluir(quadrinho)">
+                    <button *ngIf="!isPublicView && authService.isFuncionario()" mat-stroked-button color="warn" (click)="excluir(quadrinho)">
                         <mat-icon>delete</mat-icon>
                         Excluir
                     </button>

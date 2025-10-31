@@ -5,8 +5,6 @@ import { Quadrinho } from '../models/quadrinho.model';
 import { QuadrinhoService } from '../services/quadrinho.service';
 import { AuthService } from '../services/auth.service';
 import { ActivatedRoute } from '@angular/router';
-import { CartService } from '../services/cart.service';
-import { Subscription } from 'rxjs';
 
 // >>> IMPORTS DO PAGINATOR
 import { MatPaginatorModule, PageEvent, MatPaginatorIntl } from '@angular/material/paginator';
@@ -49,7 +47,6 @@ export class QuadrinhoListComponent implements OnInit, OnDestroy {
   quadrinhos: Quadrinho[] = [];
   readonly placeholderImage = 'assets/images/placeholder-comic.svg';
   private imageUrls = new Map<number, string>();
-  private subscriptions = new Subscription();
 
   // >>> CONTROLES DE PAGINAÇÃO/PESQUISA
   page = 0;
@@ -57,28 +54,20 @@ export class QuadrinhoListComponent implements OnInit, OnDestroy {
   length = 0;   // será totalRecords ou filteredRecords, conforme q
   q = '';       // termo de pesquisa
   isPublicView = false;
-  cartCount = 0;
 
   constructor(
     private quadrinhoService: QuadrinhoService,
     public authService: AuthService,
-    private route: ActivatedRoute,
-    private cartService: CartService
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     this.isPublicView = this.route.snapshot.data?.['publicView'] ?? false;
-    this.subscriptions.add(
-      this.cartService.items$.subscribe(items => {
-        this.cartCount = items.reduce((total, item) => total + item.quantity, 0);
-      })
-    );
     this.load();
   }
 
   ngOnDestroy(): void {
     this.clearImageCache();
-    this.subscriptions.unsubscribe();
   }
 
   // >>> CARREGA USANDO O ENDPOINT /quadrinhos/paged
@@ -120,10 +109,6 @@ export class QuadrinhoListComponent implements OnInit, OnDestroy {
         error: (err) => console.error('Erro ao excluir quadrinho', err)
       });
     }
-  }
-
-  adicionarAoCarrinho(quadrinho: Quadrinho): void {
-    this.cartService.addItem(quadrinho);
   }
 
   private populateImages(quadrinhos: Quadrinho[]): void {
@@ -173,3 +158,4 @@ export class QuadrinhoListComponent implements OnInit, OnDestroy {
     this.imageUrls.clear();
   }
 }
+

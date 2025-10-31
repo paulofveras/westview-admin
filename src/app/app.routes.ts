@@ -10,12 +10,15 @@ import { authGuard } from './guards/auth.guards';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard';
 import { quadrinhoResolver } from './resolvers/quadrinho.resolver';
 import { fornecedorResolver } from './resolvers/fornecedor.resolver';
+import { CarrinhoComponent } from './carrinho';
 
 export const routes: Routes = [
     {path: 'login', component: LoginComponent},
-    {path: '', redirectTo: 'login', pathMatch: 'full'},
+    {path: '', redirectTo: 'loja', pathMatch: 'full'},
+    {path: 'loja', component: QuadrinhoListComponent, data: { publicView: true }},
+    {path: 'carrinho', component: CarrinhoComponent},
     {path: 'dashboard', component: AdminDashboardComponent, canActivate: [authGuard]},
-    {path: 'quadrinhos/list', component: QuadrinhoListComponent, canActivate: [authGuard]},
+    {path: 'quadrinhos/list', component: QuadrinhoListComponent, canActivate: [authGuard], data: { roles: ['Funcionario', 'Cliente'], publicView: false }},
     {path: 'quadrinhos/new', component: QuadrinhoFormComponent, canActivate: [authGuard]},
     {path: 'quadrinhos/edit/:id', component: QuadrinhoFormComponent, resolve: {quadrinho: quadrinhoResolver}, canActivate: [authGuard]},
     {path: 'fornecedores/list', component: FornecedorListComponent, canActivate: [authGuard]},

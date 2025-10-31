@@ -1,14 +1,28 @@
 <header>
-  <a routerLink="/dashboard" class="header-title-link">
-    <h1>Westview Admin</h1>
+  <a (click)="goToStore()" class="header-title-link">
+    <h1>{{ isStoreView() ? 'Westview Comics' : 'Westview Admin' }}</h1>
   </a>
 
-  <nav *ngIf="authService.isLoggedIn() && authService.isFuncionario()">
-    <ul>
-      <li><a routerLink="/quadrinhos/list">Quadrinhos</a></li>
-      <li><a routerLink="/fornecedores/list">Fornecedores</a></li>
-    </ul>
-    <button (click)="logout()" class="btn-logout">Sair</button>
+  <nav>
+    <ng-container *ngIf="isAdminView() && authService.isLoggedIn() && authService.isFuncionario(); else storeNav">
+      <ul>
+        <li><a routerLink="/quadrinhos/list" routerLinkActive="active">Quadrinhos</a></li>
+        <li><a routerLink="/fornecedores/list" routerLinkActive="active">Fornecedores</a></li>
+        <li><a (click)="goToStore()">Área da Loja</a></li>
+      </ul>
+    </ng-container>
+    <ng-template #storeNav>
+      <ul>
+        <li><a (click)="goToAdmin()">Área Administrativa</a></li>
+        <li>
+          <a routerLink="/carrinho" routerLinkActive="active" class="cart-link">
+            Carrinho
+            <span *ngIf="cartCount > 0" class="cart-badge">{{ cartCount }}</span>
+          </a>
+        </li>
+      </ul>
+    </ng-template>
+    <button *ngIf="authService.isLoggedIn()" (click)="logout()" class="btn-logout">Sair</button>
   </nav>
 </header>
 

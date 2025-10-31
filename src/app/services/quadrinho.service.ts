@@ -21,11 +21,11 @@ export class QuadrinhoService {
   }
 
   save(quadrinho: any): Observable<Quadrinho> {
-    return this.http.post<Quadrinho>(`${this.baseURL}/quadrinhos`, quadrinho);
+    return this.http.post<Quadrinho>(`${this.baseURL}/quadrinhos`, this.buildPayload(quadrinho));
   }
 
-  update(quadrinho: any): Observable<Quadrinho> {
-    return this.http.put<Quadrinho>(`${this.baseURL}/quadrinhos/${quadrinho.id}`, quadrinho);
+  update(quadrinho: any): Observable<void> {
+    return this.http.put<void>(`${this.baseURL}/quadrinhos/${quadrinho.id}`, this.buildPayload(quadrinho));
   }
 
   delete(quadrinho: Quadrinho): Observable<any> {
@@ -35,20 +35,19 @@ export class QuadrinhoService {
   // --- INÍCIO DAS NOVAS FUNÇÕES ---
 
   // Função para fazer o upload da imagem
-  uploadImagem(id: number, nomeImagem: string, imagem: File): Observable<any> {
+  uploadImagem(id: number, nomeImagem: string, imagem: File): Observable<void> {
     const formData = new FormData();
-    formData.append('id', id.toString());
     formData.append('nomeImagem', nomeImagem);
     formData.append('imagem', imagem);
 
     // O endpoint deve corresponder ao seu QuadrinhoResource no backend
-    return this.http.patch<any>(`${this.baseURL}/quadrinhos/image/upload`, formData);
+    return this.http.patch<void>(`${this.baseURL}/quadrinhos/${id}/image/upload`, formData);
   }
 
-  // Função auxiliar para obter a URL completa da imagem
-  getImageUrl(nomeImagem: string): string {
-    // O endpoint deve corresponder ao seu FileService no backend
-    return `${this.baseURL}/quadrinhos/image/download/${nomeImagem}`;
+  downloadImagem(nomeImagem: string): Observable<Blob> {
+    return this.http.get(`${this.baseURL}/quadrinhos/image/download/${nomeImagem}`, {
+      responseType: 'blob'
+    });
   }
 
   // --- FIM DAS NOVAS FUNÇÕES ---
@@ -69,5 +68,14 @@ export class QuadrinhoService {
       .set('pageSize', String(pageSize));
     if (q) params = params.set('q', q);
     return this.http.get<PageResult<Quadrinho>>(`${this.baseURL}/quadrinhos/paged`, { params });
+  }
+
+  private buildPayload(quadrinho: any): any {
+    const payload: any = { ...quadrinho };
+    payload.id_material = quadrinho.idMaterial ?? null;
+    payload.id_fornecedor = quadrinho.idFornecedor ?? null;
+    delete payload.idMaterial;
+    delete payload.idFornecedor;
+    return payload;
   }
 }
