@@ -1,29 +1,61 @@
 <div class="dashboard-container">
   <div class="dashboard-header">
     <h1>Painel Administrativo Westview</h1>
-    <p>Selecione uma opção para gerenciar o conteúdo da loja.</p>
+    <p>Escolha um modulo para gerenciar os cadastros da loja.</p>
   </div>
 
   <div class="dashboard-grid">
     <a routerLink="/quadrinhos/list" class="dashboard-card">
       <div class="card-icon">
-        <img src="https://img.icons8.com/ios-filled/100/ffffff/books.png" alt="Ícone de Quadrinhos"/>
+        <img src="https://img.icons8.com/ios-filled/100/ffffff/books.png" alt="Icone de Quadrinhos">
       </div>
       <div class="card-title">
-        <h2>Gerenciar Quadrinhos</h2>
-        <p>Adicionar, editar e remover HQs do catálogo.</p>
+        <h2>Quadrinhos</h2>
+        <p>Adicionar, editar e remover HQs do catalogo.</p>
       </div>
     </a>
 
     <a routerLink="/fornecedores/list" class="dashboard-card">
       <div class="card-icon">
-        <img src="https://img.icons8.com/ios-filled/100/ffffff/box.png" alt="Ícone de Fornecedores"/>
+        <img src="https://img.icons8.com/ios-filled/100/ffffff/box.png" alt="Icone de Fornecedores">
       </div>
       <div class="card-title">
-        <h2>Gerenciar Fornecedores</h2>
-        <p>Visualizar e cadastrar novos fornecedores.</p>
+        <h2>Fornecedores</h2>
+        <p>Gerenciar parceiros e responsaveis pelo abastecimento.</p>
       </div>
     </a>
 
-    </div>
+    <a routerLink="/clientes/list" class="dashboard-card">
+      <div class="card-icon">
+        <img src="https://img.icons8.com/ios-filled/100/ffffff/conference.png" alt="Icone de Clientes">
+      </div>
+      <div class="card-title">
+        <h2>Clientes</h2>
+        <p>Consultar cadastros e manter os dados atualizados.</p>
+      </div>
+    </a>
+
+    <a routerLink="/usuarios/list" class="dashboard-card" *ngIf="authService.hasRole('Administrador')">
+      <div class="card-icon">
+        <img src="https://img.icons8.com/ios-filled/100/ffffff/lock-2.png" alt="Icone de Usuarios">
+      </div>
+      <div class="card-title">
+        <h2>Usuarios</h2>
+        <p>Controlar logins do sistema administrativo.</p>
+      </div>
+    </a>
+
+    <a routerLink="/administradores/list" class="dashboard-card" *ngIf="authService.hasRole('Administrador')">
+      <div class="card-icon">
+        <img
+          src="https://img.icons8.com/ios-filled/100/ffffff/administrative-tools.png"
+          alt="Icone de Administradores"
+        >
+      </div>
+      <div class="card-title">
+        <h2>Administradores</h2>
+        <p>Gerenciar contas com acesso avancado.</p>
+      </div>
+    </a>
+  </div>
 </div>

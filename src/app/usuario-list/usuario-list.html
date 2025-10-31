@@ -1,0 +1,68 @@
+<div class="list-container">
+  <header class="list-header">
+    <h1>Usuarios</h1>
+    <a routerLink="/usuarios/new" mat-flat-button color="primary">
+      <mat-icon>person_add</mat-icon>
+      Novo Usuario
+    </a>
+  </header>
+
+  <div class="filters">
+    <mat-form-field appearance="outline">
+      <mat-label>Pesquisar por username</mat-label>
+      <input
+        matInput
+        [(ngModel)]="q"
+        (keyup.enter)="pesquisar()"
+        placeholder="Digite o username">
+      <button mat-icon-button matSuffix (click)="q = ''; pesquisar()" *ngIf="q">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+    <button mat-stroked-button color="primary" (click)="pesquisar()">
+      <mat-icon>search</mat-icon>
+      Buscar
+    </button>
+  </div>
+
+  <section class="table-wrapper" *ngIf="usuarios.length; else emptyState">
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th class="actions">Acoes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let usuario of usuarios">
+          <td>{{ usuario.username }}</td>
+          <td class="actions">
+            <a mat-icon-button [routerLink]="['/usuarios/edit', usuario.id]" color="primary">
+              <mat-icon>edit</mat-icon>
+            </a>
+            <button mat-icon-button color="warn" (click)="excluir(usuario)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <mat-paginator
+    [length]="length"
+    [pageSize]="pageSize"
+    [pageIndex]="page"
+    [pageSizeOptions]="[5, 10, 20]"
+    (page)="paginar($event)">
+  </mat-paginator>
+</div>
+
+<ng-template #emptyState>
+  <div class="empty-state">
+    <p>Nenhum usuario encontrado.</p>
+    <a routerLink="/usuarios/new" mat-stroked-button color="primary">
+      Cadastrar Usuario
+    </a>
+  </div>
+</ng-template>

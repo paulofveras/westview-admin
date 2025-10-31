@@ -1,0 +1,74 @@
+<div class="list-container">
+  <header class="list-header">
+    <h1>Clientes</h1>
+    <a routerLink="/clientes/new" mat-flat-button color="primary">
+      <mat-icon>person_add</mat-icon>
+      Novo Cliente
+    </a>
+  </header>
+
+  <div class="filters">
+    <mat-form-field appearance="outline">
+      <mat-label>Pesquisar por nome</mat-label>
+      <input
+        matInput
+        [(ngModel)]="q"
+        (keyup.enter)="pesquisar()"
+        placeholder="Digite o nome do cliente">
+      <button mat-icon-button matSuffix (click)="q = ''; pesquisar()" *ngIf="q">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+    <button mat-stroked-button color="primary" (click)="pesquisar()">
+      <mat-icon>search</mat-icon>
+      Buscar
+    </button>
+  </div>
+
+  <section class="table-wrapper" *ngIf="clientes.length; else emptyState">
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Usuario</th>
+          <th>Email</th>
+          <th class="actions">Acoes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cliente of clientes">
+          <td>{{ cliente.nome }}</td>
+          <td>{{ cliente.cpf }}</td>
+          <td>{{ cliente.username || cliente.usuario?.username }}</td>
+          <td>{{ cliente.email }}</td>
+          <td class="actions">
+            <a mat-icon-button [routerLink]="['/clientes/edit', cliente.id]" color="primary">
+              <mat-icon>edit</mat-icon>
+            </a>
+            <button mat-icon-button color="warn" (click)="excluir(cliente)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <mat-paginator
+    [length]="length"
+    [pageSize]="pageSize"
+    [pageIndex]="page"
+    [pageSizeOptions]="[5, 10, 20]"
+    (page)="paginar($event)">
+  </mat-paginator>
+</div>
+
+<ng-template #emptyState>
+  <div class="empty-state">
+    <p>Nenhum cliente encontrado.</p>
+    <a routerLink="/clientes/new" mat-stroked-button color="primary">
+      Cadastrar Cliente
+    </a>
+  </div>
+</ng-template>

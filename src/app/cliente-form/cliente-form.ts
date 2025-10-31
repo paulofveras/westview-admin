@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ClienteService } from '../services/cliente.service';
 import { Cliente } from '../models/pessoa.model';
-import { CommonModule } from '@angular/common';
+import { ClienteService } from '../services/cliente.service';
 
 @Component({
   selector: 'app-cliente-form',
@@ -12,74 +12,73 @@ import { CommonModule } from '@angular/common';
   templateUrl: './cliente-form.html',
   styleUrl: './cliente-form.css'
 })
-export class ClienteFormComponent {
+export class ClienteFormComponent implements OnInit {
+  formGroup!: FormGroup;
+  isEdit = false;
 
-  formGroup: FormGroup;
+  constructor(
+    private fb: FormBuilder,
+    private clienteService: ClienteService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
-  constructor(private formBuilder: FormBuilder,
-              private clienteService: ClienteService,
-              private router: Router,
-              private activatedRoute: ActivatedRoute) {
+  ngOnInit(): void {
+    const cliente: Cliente | undefined = this.route.snapshot.data['cliente'];
+    this.isEdit = !!cliente && !!cliente.id;
 
-    const cliente: Cliente = this.activatedRoute.snapshot.data['cliente'];
+    const username = cliente?.username ?? cliente?.usuario?.username ?? '';
 
-    this.formGroup = formBuilder.group({
-      id: [(cliente && cliente.id) ? cliente.id : null],
-      nome: [(cliente && cliente.nome) ? cliente.nome : '', Validators.required],
-      cpf: [(cliente && cliente.cpf) ? cliente.cpf : '', Validators.required],
-      email: [(cliente && cliente.email) ? cliente.email : ''],
-      username: [(cliente && cliente.username) ? cliente.username : '', Validators.required],
+    this.formGroup = this.fb.group({
+      id: [cliente?.id ?? null],
+      nome: [cliente?.nome ?? '', [Validators.required, Validators.minLength(2)]],
+      cpf: [cliente?.cpf ?? '', [Validators.required, Validators.minLength(11)]],
+      email: [cliente?.email ?? '', [Validators.email]],
+      username: [username, [Validators.required, Validators.minLength(3)]],
       senha: ['', Validators.required],
-      endereco: formBuilder.group({
-        cep: [(cliente && cliente.endereco.cep) ? cliente.endereco.cep : '', Validators.required],
-        rua: [(cliente && cliente.endereco.rua) ? cliente.endereco.rua : '', Validators.required],
-        numero: [(cliente && cliente.endereco.numero) ? cliente.endereco.numero : '', Validators.required]
+      endereco: this.fb.group({
+        cep: [cliente?.endereco?.cep ?? '', Validators.required],
+        rua: [cliente?.endereco?.rua ?? '', Validators.required],
+        numero: [cliente?.endereco?.numero ?? '', Validators.required]
       }),
-      telefone: formBuilder.group({
-        codigoArea: [(cliente && cliente.telefone.codigoArea) ? cliente.telefone.codigoArea : '', Validators.required],
-        numero: [(cliente && cliente.telefone.numero) ? cliente.telefone.numero : '', Validators.required]
+      telefone: this.fb.group({
+        codigoArea: [cliente?.telefone?.codigoArea ?? '', Validators.required],
+        numero: [cliente?.telefone?.numero ?? '', Validators.required]
       })
     });
   }
 
-  salvar() {
-    if (this.formGroup.valid) {
-      const cliente = this.formGroup.value;
-      if (cliente.id == null) {
-        this.clienteService.save(cliente).subscribe({
-          next: (clienteCadastrado) => {
-            this.router.navigateByUrl('/clientes/list');
-          },
-          error: (err) => {
-            console.log('Erro ao Incluir' + JSON.stringify(err));
-          }
-        });
-      } else {
-        this.clienteService.update(cliente).subscribe({
-          next: (clienteAlterado) => {
-            this.router.navigateByUrl('/clientes/list');
-          },
-          error: (err) => {
-            console.log('Erro ao Editar' + JSON.stringify(err));
-          }
-        });
-      }
+  salvar(): void {
+    if (this.formGroup.invalid) {
+      this.formGroup.markAllAsTouched();
+      return;
+    }
+
+    const value = this.formGroup.value as Cliente;
+    if (!value.id) {
+      this.clienteService.create(value).subscribe({
+        next: () => this.router.navigateByUrl('/clientes/list'),
+        error: (error) => console.error('Erro ao criar cliente', error)
+      });
+    } else {
+      this.clienteService.update(value.id, value).subscribe({
+        next: () => this.router.navigateByUrl('/clientes/list'),
+        error: (error) => console.error('Erro ao atualizar cliente', error)
+      });
     }
   }
 
-  excluir() {
-    if (this.formGroup.valid) {
-      const cliente = this.formGroup.value;
-      if (cliente.id != null) {
-        this.clienteService.delete(cliente).subscribe({
-          next: () => {
-            this.router.navigateByUrl('/clientes/list');
-          },
-          error: (err) => {
-            console.log('Erro ao Excluir' + JSON.stringify(err));
-          }
-        });
-      }
+  excluir(): void {
+    const id = this.formGroup.get('id')?.value;
+    if (!id) {
+      return;
+    }
+
+    if (confirm('Deseja realmente excluir este cliente?')) {
+      this.clienteService.delete(id).subscribe({
+        next: () => this.router.navigateByUrl('/clientes/list'),
+        error: (error) => console.error('Erro ao excluir cliente', error)
+      });
     }
   }
 }

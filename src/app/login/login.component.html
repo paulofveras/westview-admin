@@ -1,27 +1,31 @@
 <div class="login-container">
   <div class="login-form">
     <h2>Login Administrativo</h2>
-    
+
     <div *ngIf="mensagem" [class]="'mensagem ' + tipoMensagem">
       {{ mensagem }}
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="form-group">
-        <label for="username">Usuário</label>
+        <label for="username">Usuario</label>
         <input type="text" id="username" formControlName="username" required>
       </div>
+
       <div class="form-group">
         <label for="senha">Senha</label>
         <input type="password" id="senha" formControlName="senha" required>
       </div>
+
       <div class="form-group">
         <label for="perfil">Perfil</label>
         <select id="perfil" formControlName="perfil">
-            <option [ngValue]="1">Administrador</option>
-            <option [ngValue]="2">Cliente</option>
+          <option [ngValue]="1">Funcionario</option>
+          <option [ngValue]="2">Cliente</option>
+          <option [ngValue]="3">Administrador</option>
         </select>
       </div>
+
       <div class="form-group">
         <button type="submit" [disabled]="form.invalid || isLoading">
           {{ isLoading ? 'Entrando...' : 'Entrar' }}

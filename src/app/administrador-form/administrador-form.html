@@ -16,7 +16,17 @@
     </div>
 
     <div class="form-field">
-      <label>Username</label>
+      <label>Cargo</label>
+      <input type="text" formControlName="cargo">
+    </div>
+
+    <div class="form-field">
+      <label>Nivel de Acesso</label>
+      <input type="text" formControlName="nivelAcesso">
+    </div>
+
+    <div class="form-field">
+      <label>Usuario</label>
       <input type="text" formControlName="username">
     </div>
 
@@ -26,7 +36,7 @@
     </div>
 
     <fieldset formGroupName="endereco" class="fieldset-group">
-      <legend>Endereço</legend>
+      <legend>Endereco</legend>
       <div class="form-field">
         <label>CEP</label>
         <input type="number" formControlName="cep">
@@ -36,7 +46,7 @@
         <input type="text" formControlName="rua">
       </div>
       <div class="form-field">
-        <label>Número</label>
+        <label>Numero</label>
         <input type="number" formControlName="numero">
       </div>
     </fieldset>
@@ -48,21 +58,23 @@
         <input type="text" formControlName="codigoArea">
       </div>
       <div class="form-field">
-        <label>Número</label>
+        <label>Numero</label>
         <input type="text" formControlName="numero">
       </div>
     </fieldset>
 
     <div class="form-actions">
-      <button type="button" class="btn-primary" (click)="salvar()" [disabled]="formGroup.invalid">Salvar</button>
+      <button type="button" (click)="salvar()" [disabled]="formGroup.invalid" class="btn-primary">
+        Salvar
+      </button>
       <button
         type="button"
-        class="btn-danger"
         (click)="excluir()"
-        *ngIf="formGroup.get('id')?.value">
+        *ngIf="formGroup.get('id')?.value"
+        class="btn-danger">
         Excluir
       </button>
-      <a routerLink="/clientes/list" class="btn-secondary">Cancelar</a>
+      <a routerLink="/administradores/list" class="btn-secondary">Cancelar</a>
     </div>
   </form>
 </div>

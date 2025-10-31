@@ -1,0 +1,27 @@
+<div class="form-container">
+  <form [formGroup]="formGroup" class="form-grid">
+    <div class="form-field">
+      <label>Usuário</label>
+      <input type="text" formControlName="username">
+    </div>
+
+    <div class="form-field">
+      <label>Senha <span *ngIf="isEdit" class="hint">(deixe em branco para manter)</span></label>
+      <input type="password" formControlName="senha">
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-primary" (click)="salvar()" [disabled]="formGroup.invalid">
+        Salvar
+      </button>
+      <button
+        type="button"
+        class="btn-danger"
+        (click)="excluir()"
+        *ngIf="formGroup.get('id')?.value">
+        Excluir
+      </button>
+      <a routerLink="/usuarios/list" class="btn-secondary">Cancelar</a>
+    </div>
+  </form>
+</div>

@@ -8,12 +8,19 @@
       <ul>
         <li><a routerLink="/quadrinhos/list" routerLinkActive="active">Quadrinhos</a></li>
         <li><a routerLink="/fornecedores/list" routerLinkActive="active">Fornecedores</a></li>
-        <li><a (click)="goToStore()">Área da Loja</a></li>
+        <li><a routerLink="/clientes/list" routerLinkActive="active">Clientes</a></li>
+        <li *ngIf="authService.hasRole('Administrador')">
+          <a routerLink="/usuarios/list" routerLinkActive="active">Usuarios</a>
+        </li>
+        <li *ngIf="authService.hasRole('Administrador')">
+          <a routerLink="/administradores/list" routerLinkActive="active">Administradores</a>
+        </li>
+        <li><a (click)="goToStore()">Area da Loja</a></li>
       </ul>
     </ng-container>
     <ng-template #storeNav>
       <ul>
-        <li><a (click)="goToAdmin()">Área Administrativa</a></li>
+        <li><a (click)="goToAdmin()">Area Administrativa</a></li>
         <li>
           <a routerLink="/carrinho" routerLinkActive="active" class="cart-link">
             Carrinho

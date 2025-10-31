@@ -1,8 +1,8 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
@@ -12,39 +12,40 @@ import { CommonModule } from '@angular/common';
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
-  // Renomeado de volta para 'form' para corresponder ao HTML
-  form: FormGroup; 
-  
-  // Adicionadas as propriedades que o HTML esperava
-  mensagem: string = '';
+  form: FormGroup;
+  mensagem = '';
   tipoMensagem: 'sucesso' | 'erro' = 'erro';
-  isLoading: boolean = false;
+  isLoading = false;
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
     this.form = this.fb.group({
       username: ['', Validators.required],
       senha: ['', Validators.required],
-      perfil: [1, Validators.required] // Perfil 1 = Funcionario por padrão
+      perfil: [1, Validators.required] // 1 = Funcionario, 2 = Cliente, 3 = Administrador
     });
   }
 
   onSubmit(): void {
-    if (this.form.valid) {
-      this.isLoading = true; // Ativa o estado de carregamento
-      this.authService.login(this.form.value).subscribe({
-        next: (response) => {
-          this.isLoading = false; // Desativa o carregamento
-          console.log('Login bem-sucedido', response);
-          this.router.navigate(['/quadrinhos/list']);
-        },
-        error: (err) => {
-          this.isLoading = false; // Desativa o carregamento
-          console.error('Erro no login', err);
-          // Define a mensagem de erro para ser exibida no HTML
-          this.mensagem = 'Usuário ou senha inválidos.';
-          this.tipoMensagem = 'erro';
-        }
-      });
+    if (this.form.invalid) {
+      return;
     }
+
+    this.isLoading = true;
+    this.authService.login(this.form.value).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.router.navigate(['/quadrinhos/list']);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Erro no login', err);
+        this.mensagem = 'Usuario ou senha invalidos.';
+        this.tipoMensagem = 'erro';
+      }
+    });
   }
 }
