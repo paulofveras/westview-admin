@@ -1,60 +1,96 @@
 <div class="form-container">
-    <form [formGroup]="formGroup" class="form-grid">
+    <h2>Novo Funcionário</h2> <form [formGroup]="formGroup" class="form-grid">
+      
       <div class="form-field">
         <label>Nome:</label>
-        <input type="text" formControlName="nome">
+        <input type="text" formControlName="nome" placeholder="Nome Completo">
+        <small class="error-msg" *ngIf="formGroup.get('nome')?.invalid && formGroup.get('nome')?.touched">
+          Obrigatório.
+        </small>
       </div>
   
-      <div class="form-field">
-        <label>CPF:</label>
-        <input type="text" formControlName="cpf">
-      </div>
-  
-      <div class="form-field">
-        <label>Cargo:</label>
-        <input type="text" formControlName="cargo">
+      <div class="form-row">
+        <div class="form-field full-width">
+          <label>CPF:</label>
+          <input type="text" formControlName="cpf" placeholder="Apenas números" maxlength="11">
+          <small class="error-msg" *ngIf="formGroup.get('cpf')?.invalid && formGroup.get('cpf')?.touched">
+            11 dígitos.
+          </small>
+        </div>
+        <div class="form-field full-width">
+          <label>Cargo:</label>
+          <input type="text" formControlName="cargo" placeholder="Ex: Vendedor">
+          <small class="error-msg" *ngIf="formGroup.get('cargo')?.invalid && formGroup.get('cargo')?.touched">
+            Obrigatório.
+          </small>
+        </div>
       </div>
   
       <div class="form-field">
         <label>Email:</label>
-        <input type="email" formControlName="email">
+        <input type="email" formControlName="email" placeholder="funcionario@westview.com">
+        <small class="error-msg" *ngIf="formGroup.get('email')?.invalid && formGroup.get('email')?.touched">
+            Email inválido.
+        </small>
       </div>
 
       <div class="form-field">
         <label>Username:</label>
         <input type="text" formControlName="username">
+        <small class="error-msg" *ngIf="formGroup.get('username')?.invalid && formGroup.get('username')?.touched">
+          Obrigatório.
+        </small>
       </div>
 
       <div class="form-field">
         <label>Senha:</label>
         <input type="password" formControlName="senha">
+        <small class="error-msg" *ngIf="formGroup.get('senha')?.invalid && formGroup.get('senha')?.touched">
+            Obrigatória.
+        </small>
       </div>
   
       <fieldset formGroupName="endereco" class="fieldset-group">
         <legend>Endereço</legend>
-        <div class="form-field">
-          <label>CEP:</label>
-          <input type="number" formControlName="cep">
-        </div>
-        <div class="form-field">
-          <label>Rua:</label>
-          <input type="text" formControlName="rua">
-        </div>
-        <div class="form-field">
-          <label>Número:</label>
-          <input type="number" formControlName="numero">
+        <div class="form-row">
+            <div class="form-field small-field">
+              <label>CEP:</label>
+              <input type="number" formControlName="cep" placeholder="00000000">
+              <small class="error-msg" *ngIf="formGroup.get('endereco.cep')?.invalid && formGroup.get('endereco.cep')?.touched">
+                Obrigatório.
+              </small>
+            </div>
+            <div class="form-field full-width">
+              <label>Rua:</label>
+              <input type="text" formControlName="rua">
+              <small class="error-msg" *ngIf="formGroup.get('endereco.rua')?.invalid && formGroup.get('endereco.rua')?.touched">
+                Obrigatório.
+              </small>
+            </div>
+            <div class="form-field small-field">
+              <label>Número:</label>
+              <input type="number" formControlName="numero">
+            </div>
         </div>
       </fieldset>
   
       <fieldset formGroupName="telefone" class="fieldset-group">
         <legend>Telefone</legend>
-        <div class="form-field">
-          <label>DDD:</label>
-          <input type="text" formControlName="codigoArea">
-        </div>
-        <div class="form-field">
-          <label>Número:</label>
-          <input type="text" formControlName="numero">
+        <div class="form-row">
+            <div class="form-field small-field">
+              <label>DDD:</label>
+              <input type="text" formControlName="codigoArea" placeholder="XX" maxlength="2">
+              <small class="error-msg" *ngIf="formGroup.get('telefone.codigoArea')?.invalid && formGroup.get('telefone.codigoArea')?.touched">
+                2 dígitos.
+              </small>
+            </div>
+            <div class="form-field full-width">
+              <label>Número:</label>
+              <input type="text" formControlName="numero" placeholder="9XXXX-XXXX">
+              <small class="error-msg" *ngIf="formGroup.get('telefone.numero')?.invalid && formGroup.get('telefone.numero')?.touched">
+                Inválido.
+              </small>
+            </div>
         </div>
       </fieldset>
   

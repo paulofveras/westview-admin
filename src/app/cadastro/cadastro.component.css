@@ -111,3 +111,22 @@ input:focus {
 .link-login:hover {
   text-decoration: underline;
 }
+
+.error-msg {
+  color: #c62828; /* Vermelho padrão do seu tema */
+  font-size: 0.75rem;
+  margin-top: 4px;
+  display: block;
+  font-weight: 500;
+}
+
+/* Ajuste para o campo de CEP não ficar tão pequeno */
+.small-cep {
+  flex: 0 0 100px;
+}
+
+/* Melhorar feedback visual dos inputs inválidos */
+input.ng-invalid.ng-touched {
+  border-color: #c62828;
+  background-color: rgba(198, 40, 40, 0.03);
+}

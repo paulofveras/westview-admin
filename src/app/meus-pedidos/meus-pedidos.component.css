@@ -1,0 +1,8 @@
+.container { max-width: 800px; margin: 20px auto; padding: 0 20px; }
+h2 { color: #333; margin-bottom: 20px; }
+.loading { text-align: center; padding: 20px; color: #666; }
+.pedido-list { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+.pedido-card { background: #fff; border: 1px solid #eee; }
+.status-pending { color: #e67e22; font-weight: bold; }
+.status-success { color: #27ae60; font-weight: bold; }
+.empty-msg { text-align: center; padding: 30px; color: #999; font-style: italic; }

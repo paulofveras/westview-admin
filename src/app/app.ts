@@ -35,6 +35,13 @@ export class AppComponent {
     });
   }
 
+  // --- CORREÇÃO AQUI ---
+  get nomeUsuario(): string {
+    const usuario = this.authService.getUsuarioLogado();
+    // Se usuario existir E tiver nome, retorna o nome. Senão, retorna string vazia.
+    return usuario?.nome ?? ''; 
+  }
+
   logout() {
     this.authService.logout();
   }

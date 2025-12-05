@@ -1,26 +1,26 @@
 <div class="form-container">
+  <h2>{{ isEdit ? 'Editando Usuário' : 'Novo Usuário' }}</h2>
+  
   <form [formGroup]="formGroup" class="form-grid">
     <div class="form-field">
-      <label>Usuário</label>
+      <label>Usuário (Login)</label>
       <input type="text" formControlName="username">
+      <small class="error-msg" *ngIf="formGroup.get('username')?.invalid && formGroup.get('username')?.touched">
+        Mínimo de 3 caracteres.
+      </small>
     </div>
 
     <div class="form-field">
-      <label>Senha <span *ngIf="isEdit" class="hint">(deixe em branco para manter)</span></label>
+      <label>Senha <span *ngIf="isEdit" style="font-weight:normal; font-size:0.8em">(deixe em branco para manter)</span></label>
       <input type="password" formControlName="senha">
+      <small class="error-msg" *ngIf="formGroup.get('senha')?.invalid && formGroup.get('senha')?.touched">
+        Obrigatória na criação.
+      </small>
     </div>
 
     <div class="form-actions">
-      <button type="button" class="btn-primary" (click)="salvar()" [disabled]="formGroup.invalid">
-        Salvar
-      </button>
-      <button
-        type="button"
-        class="btn-danger"
-        (click)="excluir()"
-        *ngIf="formGroup.get('id')?.value">
-        Excluir
-      </button>
+      <button (click)="salvar()" [disabled]="formGroup.invalid" class="btn-primary">Salvar</button>
+      <button (click)="excluir()" *ngIf="isEdit" class="btn-danger">Excluir</button>
       <a routerLink="/usuarios/list" class="btn-secondary">Cancelar</a>
     </div>
   </form>

@@ -20,6 +20,7 @@ import { administradorResolver } from './resolvers/administrador.resolver';
 import { usuarioResolver } from './resolvers/usuario.resolver';
 import { PerfilComponent } from './perfil/perfil.component';
 import { CadastroComponent } from './cadastro/cadastro.component';
+import { MeusPedidosComponent } from './meus-pedidos/meus-pedidos.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -28,7 +29,7 @@ export const routes: Routes = [
   { path: '', redirectTo: 'loja', pathMatch: 'full' },
   { path: 'loja', component: QuadrinhoListComponent, data: { publicView: true } },
   { path: 'carrinho', component: CarrinhoComponent },
-
+  { path: 'meus-pedidos', component: MeusPedidosComponent, canActivate: [authGuard] },
   { path: 'dashboard', component: AdminDashboardComponent, canActivate: [authGuard] },
 
   {
@@ -67,12 +68,14 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { roles: ['Funcionario', 'Administrador'] }
   },
+  
   {
     path: 'clientes/edit/:id',
     component: ClienteFormComponent,
     resolve: { cliente: clienteResolver },
     canActivate: [authGuard],
-    data: { roles: ['Funcionario', 'Administrador'] }
+    // Adicionei 'Cliente' na lista de permissões
+    data: { roles: ['Funcionario', 'Administrador', 'Cliente'] } 
   },
 
   {

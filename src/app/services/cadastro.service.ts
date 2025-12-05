@@ -3,10 +3,9 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Cliente } from '../models/pessoa.model';
 
-// Interface que espelha o CadastroBasicoDTO.java
 export interface CadastroBasicoDTO {
   nome: string;
-  cpf: string; // <--- NOVO CAMPO
+  cpf: string;
   email: string;
   username: string;
   senha: string;
@@ -21,6 +20,15 @@ export interface CadastroBasicoDTO {
   };
 }
 
+// Interface para a resposta do ViaCEP
+export interface EnderecoViaCep {
+  logradouro: string;
+  bairro: string;
+  localidade: string;
+  uf: string;
+  erro?: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -31,5 +39,12 @@ export class CadastroService {
 
   cadastrar(dto: CadastroBasicoDTO): Observable<Cliente> {
     return this.http.post<Cliente>(this.baseURL, dto);
+  }
+
+  // --- NOVO MÉTODO: Consultar CEP ---
+  consultarCep(cep: string): Observable<EnderecoViaCep> {
+    // Remove caracteres não numéricos para garantir
+    const cepLimpo = cep.replace(/\D/g, '');
+    return this.http.get<EnderecoViaCep>(`https://viacep.com.br/ws/${cepLimpo}/json/`);
   }
 }

@@ -1,38 +1,56 @@
 <header>
-  <a (click)="goToStore()" class="header-title-link">
+  <a (click)="goToStore()" class="header-title-link" style="cursor: pointer;">
     <h1>{{ isStoreView() ? 'Westview Comics' : 'Westview Admin' }}</h1>
   </a>
 
   <nav>
-    <ng-container *ngIf="isAdminView() && authService.isLoggedIn() && authService.isFuncionario(); else storeNav">
+    <ng-container *ngIf="isAdminView() && authService.isFuncionario(); else storeNav">
       <ul>
-        <li><a routerLink="/quadrinhos/list" routerLinkActive="active">Quadrinhos</a></li>
-        <li><a routerLink="/fornecedores/list" routerLinkActive="active">Fornecedores</a></li>
-        <li><a routerLink="/clientes/list" routerLinkActive="active">Clientes</a></li>
+        <li><a routerLink="/quadrinhos/list" routerLinkActive="active" class="nav-link">Quadrinhos</a></li>
+        <li><a routerLink="/fornecedores/list" routerLinkActive="active" class="nav-link">Fornecedores</a></li>
+        <li><a routerLink="/clientes/list" routerLinkActive="active" class="nav-link">Clientes</a></li>
         <li *ngIf="authService.hasRole('Administrador')">
-          <a routerLink="/usuarios/list" routerLinkActive="active">Usuarios</a>
+          <a routerLink="/usuarios/list" routerLinkActive="active" class="nav-link">Usuários</a>
         </li>
         <li *ngIf="authService.hasRole('Administrador')">
-          <a routerLink="/administradores/list" routerLinkActive="active">Administradores</a>
+          <a routerLink="/administradores/list" routerLinkActive="active" class="nav-link">Administradores</a>
         </li>
-        <li><a (click)="goToStore()">Area da Loja</a></li>
+        <li><a (click)="goToStore()" class="nav-link">Ir para Loja</a></li>
       </ul>
     </ng-container>
+
     <ng-template #storeNav>
       <ul>
-        <li><a (click)="goToAdmin()">Area Administrativa</a></li>
-        <li>
-          <a routerLink="/carrinho" routerLinkActive="active" class="cart-link">
+        <li *ngIf="authService.isFuncionario()">
+          <a (click)="goToAdmin()" class="nav-link">Área Administrativa</a>
+        </li>
+
+        <li *ngIf="authService.isLoggedIn() && !authService.isFuncionario()">
+          <a routerLink="/meus-pedidos" routerLinkActive="active" class="nav-link">Meus Pedidos</a>
+        </li>
+
+        <li *ngIf="!authService.isFuncionario()">
+          <a routerLink="/carrinho" routerLinkActive="active" class="nav-link cart-link">
             Carrinho
             <span *ngIf="cartCount > 0" class="cart-badge">{{ cartCount }}</span>
           </a>
         </li>
       </ul>
     </ng-template>
-    <a *ngIf="authService.isLoggedIn()" routerLink="/perfil" class="header-link" style="margin-right: 15px; color: white; cursor: pointer;">
-      Meu Perfil
-    </a>
-    <button *ngIf="authService.isLoggedIn()" (click)="logout()" class="btn-logout">Sair</button>
+
+    <div class="user-actions">
+      <ng-container *ngIf="authService.isLoggedIn()">
+        <span class="welcome-text">Olá, <strong>{{ nomeUsuario }}</strong></span>
+        
+        <a routerLink="/perfil" routerLinkActive="active" class="nav-link">Meu Perfil</a>
+        <button (click)="logout()" class="btn-logout">Sair</button>
+      </ng-container>
+      
+      <ng-container *ngIf="!authService.isLoggedIn()">
+         <a routerLink="/login" class="nav-link">Entrar / Cadastrar</a>
+      </ng-container>
+    </div>
+
   </nav>
 </header>
 

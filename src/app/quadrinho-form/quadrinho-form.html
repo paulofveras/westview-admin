@@ -1,53 +1,59 @@
 <div class="form-container">
-  <h2 *ngIf="isEditMode; else createTitle">Editando Quadrinho</h2>
-  <ng-template #createTitle><h2>Novo Quadrinho</h2></ng-template>
+  <h2>{{ isEditMode ? 'Editando Quadrinho' : 'Novo Quadrinho' }}</h2>
 
   <form [formGroup]="formGroup">
-    <div class="form-grid">
-      <div class="form-column">
+    <div class="form-grid" style="grid-template-columns: 2fr 1fr;"> <div class="form-column">
         <div class="form-field">
-          <label>Nome:</label>
+          <label>Título</label>
           <input type="text" formControlName="nome">
+          <small class="error-msg" *ngIf="formGroup.get('nome')?.invalid && formGroup.get('nome')?.touched">
+            Obrigatório.
+          </small>
         </div>
+
         <div class="form-field">
-          <label>Descrição:</label>
-          <textarea formControlName="descricao" rows="4"></textarea>
+          <label>Descrição</label>
+          <textarea formControlName="descricao" rows="5"></textarea>
+          <small class="error-msg" *ngIf="formGroup.get('descricao')?.invalid && formGroup.get('descricao')?.touched">
+            Obrigatório.
+          </small>
         </div>
-        <div class="form-field">
-          <label>Preço:</label>
-          <input type="number" formControlName="preco">
+
+        <div class="form-row">
+            <div class="form-field full-width">
+                <label>Preço (R$)</label>
+                <input type="number" formControlName="preco">
+            </div>
+            <div class="form-field full-width">
+                <label>Estoque</label>
+                <input type="number" formControlName="estoque">
+            </div>
         </div>
+
         <div class="form-field">
-          <label>Estoque:</label>
-          <input type="number" formControlName="estoque">
-        </div>
-        <div class="form-field">
-          <label>Fornecedor:</label>
+          <label>Fornecedor</label>
           <select formControlName="idFornecedor">
-            <option [ngValue]="null" disabled>Selecione um Fornecedor</option>
-            <option *ngFor="let fornecedor of fornecedores" [ngValue]="fornecedor.id">
-              {{ fornecedor.nome }}
-            </option>
+            <option [ngValue]="null" disabled>Selecione...</option>
+            <option *ngFor="let f of fornecedores" [ngValue]="f.id">{{ f.nome }}</option>
           </select>
         </div>
+
         <div class="form-field">
-            <label>Material:</label>
-            <select formControlName="idMaterial">
-              <option [ngValue]="null" disabled>Selecione o Material</option>
-              <option *ngFor="let material of materiais" [ngValue]="material.id">
-                {{ material.nome }}
-              </option>
-            </select>
-          </div>
+          <label>Material</label>
+          <select formControlName="idMaterial">
+            <option [ngValue]="null" disabled>Selecione...</option>
+            <option *ngFor="let m of materiais" [ngValue]="m.id">{{ m.nome }}</option>
+          </select>
+        </div>
       </div>
-      
+   
       <div class="form-column">
-        <div class="form-field">
-            <label for="imagem">Capa do Quadrinho</label>
-            <input type="file" id="imagem" (change)="onFileSelected($event)" accept="image/png, image/jpeg">
+        <div class="image-upload-card">
+            <label>Capa do Quadrinho</label>
             <div *ngIf="imagePreview" class="image-preview">
-                <img [src]="imagePreview" alt="Prévia da capa">
+                <img [src]="imagePreview" alt="Prévia">
             </div>
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" style="margin-top: 10px;">
         </div>
       </div>
     </div>

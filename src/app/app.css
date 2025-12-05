@@ -1,17 +1,19 @@
 header {
   background-color: var(--header-bg-color);
   color: var(--text-light-color);
-  padding: 15px 30px;
+  padding: 0 30px; /* Removi o padding vertical para usar height fixa e alinhar melhor */
+  height: 70px;    /* Altura fixa para o header */
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 5px var(--shadow-color);
 }
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
 .header-title-link {
-  text-decoration: none; /* Remove o sublinhado do link */
-  color: inherit; /* Faz o link herdar a cor do elemento pai (branco) */
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
 }
 
 .header-title-link h1 {
@@ -20,69 +22,107 @@ header {
   font-weight: 700;
   letter-spacing: 1px;
 }
-/* --- FIM DA ALTERAÇÃO --- */
 
 nav {
   display: flex;
   align-items: center;
+  height: 100%;
 }
 
+/* Reset para a lista do menu */
 nav ul {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
+  align-items: center;
+  height: 100%;
 }
 
 nav ul li {
-  margin-left: 20px;
+  margin-left: 10px; /* Espaçamento entre itens da lista */
+  display: flex;
+  align-items: center;
 }
 
-nav ul li a {
+/* Estilo padrão para TODOS os links do menu (dentro ou fora da lista) */
+.nav-link {
   color: var(--text-light-color);
   text-decoration: none;
   font-weight: 500;
   padding: 8px 12px;
   border-radius: 4px;
   transition: background-color 0.3s ease;
+  display: inline-flex; /* Garante alinhamento vertical de ícones/texto */
+  align-items: center;
+  white-space: nowrap; /* Evita quebra de linha */
+  cursor: pointer;
 }
 
-nav ul li a:hover,
-nav ul li a.active {
+/* Efeito Hover e Active */
+.nav-link:hover,
+.nav-link.active {
   background-color: var(--primary-color);
 }
 
-.cart-link {
-  display: inline-flex;
+/* Container para ações de usuário (Perfil/Sair/Login) */
+.user-actions {
+  display: flex;
   align-items: center;
-  gap: 6px;
+  margin-left: 20px;
+  padding-left: 20px;
+  border-left: 1px solid rgba(255,255,255,0.2); /* Separador visual */
+  height: 60%;
+}
+
+/* Badge do Carrinho */
+.cart-link {
+  /* Herda estilos de .nav-link, mas mantemos a classe para referência */
 }
 
 .cart-badge {
   background-color: var(--accent-color, #ff6f61);
   color: var(--text-light-color);
   border-radius: 999px;
-  padding: 2px 8px;
+  padding: 2px 6px;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
+  margin-left: 6px;
+  min-width: 18px;
+  text-align: center;
 }
 
+/* Botão de Sair (agora parece um link do menu para consistência) */
 .btn-logout {
-  margin-left: 30px;
-  background-color: var(--primary-color);
+  background: transparent;
   color: var(--text-light-color);
-  border: none;
-  padding: 8px 16px;
+  border: 1px solid rgba(255,255,255,0.3);
+  padding: 6px 12px;
   border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
-  transition: background-color 0.3s ease;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  margin-left: 10px;
 }
 
 .btn-logout:hover {
-  background-color: var(--primary-color-hover);
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 main {
   padding: 20px;
+}
+
+.welcome-text {
+  color: var(--text-light-color);
+  font-size: 0.9rem;
+  margin-right: 15px; /* Espaço entre o nome e o botão de perfil */
+  white-space: nowrap;
+}
+
+.welcome-text strong {
+  font-weight: 700;
+  color: #fff; /* Destaca o nome em branco puro */
 }

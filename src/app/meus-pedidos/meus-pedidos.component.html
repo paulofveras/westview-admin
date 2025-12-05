@@ -1,0 +1,57 @@
+<div class="container">
+  <h2>Meus Pedidos</h2>
+
+  <div *ngIf="loading" class="loading">Carregando pedidos...</div>
+
+  <div *ngIf="!loading">
+    <mat-tab-group>
+      <mat-tab label="Em Andamento">
+        <div class="pedido-list" *ngIf="pedidosEmAndamento.length; else emptyAndamento">
+          <mat-card *ngFor="let pedido of pedidosEmAndamento" class="pedido-card">
+            <mat-card-header>
+              <mat-card-title>Pedido #{{ pedido.id }}</mat-card-title>
+              <mat-card-subtitle>{{ pedido.data | date:'dd/MM/yyyy HH:mm' }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <p><strong>Status:</strong> <span class="status-pending">{{ pedido.statusPagamento.nome }}</span></p>
+              <p><strong>Total:</strong> {{ pedido.total | currency:'BRL' }}</p>
+              <mat-list>
+                <mat-list-item *ngFor="let item of pedido.itens">
+                  <span matListItemTitle>{{ item.quadrinho.nome }}</span>
+                  <span matListItemLine>Qtd: {{ item.quantidade }} - {{ item.preco | currency:'BRL' }}</span>
+                </mat-list-item>
+              </mat-list>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <ng-template #emptyAndamento>
+          <p class="empty-msg">Nenhum pedido em andamento.</p>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab label="Entregues / Pagos">
+        <div class="pedido-list" *ngIf="pedidosEntregues.length; else emptyEntregue">
+          <mat-card *ngFor="let pedido of pedidosEntregues" class="pedido-card">
+            <mat-card-header>
+              <mat-card-title>Pedido #{{ pedido.id }}</mat-card-title>
+              <mat-card-subtitle>{{ pedido.data | date:'dd/MM/yyyy HH:mm' }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <p><strong>Status:</strong> <span class="status-success">{{ pedido.statusPagamento.nome }}</span></p>
+              <p><strong>Total:</strong> {{ pedido.total | currency:'BRL' }}</p>
+              <mat-list>
+                <mat-list-item *ngFor="let item of pedido.itens">
+                  <span matListItemTitle>{{ item.quadrinho.nome }}</span>
+                  <span matListItemLine>Qtd: {{ item.quantidade }}</span>
+                </mat-list-item>
+              </mat-list>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <ng-template #emptyEntregue>
+          <p class="empty-msg">Nenhum pedido finalizado.</p>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
