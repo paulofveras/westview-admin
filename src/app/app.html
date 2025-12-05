@@ -29,6 +29,9 @@
         </li>
       </ul>
     </ng-template>
+    <a *ngIf="authService.isLoggedIn()" routerLink="/perfil" class="header-link" style="margin-right: 15px; color: white; cursor: pointer;">
+      Meu Perfil
+    </a>
     <button *ngIf="authService.isLoggedIn()" (click)="logout()" class="btn-logout">Sair</button>
   </nav>
 </header>

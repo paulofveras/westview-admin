@@ -87,3 +87,16 @@
 .mensagem.sucesso {
     background-color: #28a745; 
 }
+
+.link-cadastro {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.link-cadastro:hover {
+  text-decoration: underline;
+  color: var(--primary-color-hover);
+}

@@ -1,0 +1,38 @@
+<div class="profile-container" *ngIf="dadosUsuario; else loading">
+  <h2>Meu Perfil ({{ perfil }})</h2>
+
+  <div class="profile-card">
+    <div class="info-group">
+      <label>Nome:</label>
+      <span>{{ dadosUsuario.nome }}</span>
+    </div>
+
+    <div class="info-group">
+      <label>Email:</label>
+      <span>{{ dadosUsuario.email }}</span>
+    </div>
+
+    <div class="info-group">
+      <label>CPF:</label>
+      <span>{{ dadosUsuario.cpf }}</span>
+    </div>
+
+    <div class="info-group">
+      <label>Usuário:</label>
+      <span>{{ dadosUsuario.username || dadosUsuario.usuario?.username }}</span>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button *ngIf="perfil === 'Cliente'" class="btn-edit" [routerLink]="['/clientes/edit', dadosUsuario.id]">
+      Editar Dados
+    </button>
+    <button class="btn-logout" (click)="logout()">Sair</button>
+  </div>
+</div>
+
+<ng-template #loading>
+  <div style="text-align: center; margin-top: 50px;">
+    <p>Carregando perfil...</p>
+  </div>
+</ng-template>

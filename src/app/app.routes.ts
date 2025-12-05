@@ -18,9 +18,13 @@ import { fornecedorResolver } from './resolvers/fornecedor.resolver';
 import { clienteResolver } from './resolvers/cliente.resolver';
 import { administradorResolver } from './resolvers/administrador.resolver';
 import { usuarioResolver } from './resolvers/usuario.resolver';
+import { PerfilComponent } from './perfil/perfil.component';
+import { CadastroComponent } from './cadastro/cadastro.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  { path: 'cadastro', component: CadastroComponent },
+  { path: 'perfil', component: PerfilComponent, canActivate: [authGuard] },
   { path: '', redirectTo: 'loja', pathMatch: 'full' },
   { path: 'loja', component: QuadrinhoListComponent, data: { publicView: true } },
   { path: 'carrinho', component: CarrinhoComponent },
