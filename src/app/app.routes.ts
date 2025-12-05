@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard';
-import { CarrinhoComponent } from './carrinho';
+import { CarrinhoComponent } from './carrinho/carrinho';
 import { ClienteFormComponent } from './cliente-form/cliente-form';
 import { ClienteListComponent } from './cliente-list/cliente-list';
 import { FornecedorFormComponent } from './fornecedor-form/fornecedor-form';

@@ -1,0 +1,128 @@
+<div class="cart-page">
+  
+  <div *ngIf="compraRealizada" class="success-screen">
+    <div class="success-content">
+      <mat-icon class="success-icon">check_circle</mat-icon>
+      <h2>Compra realizada com sucesso!</h2>
+      <p>Seu pedido foi processado.</p>
+      <button mat-flat-button color="primary" (click)="voltarLoja()">Voltar para a Loja</button>
+    </div>
+  </div>
+
+  <div *ngIf="isProcessing" class="loading-overlay">
+    <mat-spinner diameter="80"></mat-spinner>
+    <p>Processando transação...</p>
+  </div>
+
+  <ng-container *ngIf="!compraRealizada">
+    <h2>Meu carrinho</h2>
+
+    <ng-container *ngIf="items.length; else emptyCart">
+      <div class="cart-grid">
+        
+        <div class="cart-list">
+          <div class="cart-item" *ngFor="let item of items">
+            <img [src]="getUrlImagem(item.quadrinho.nomeImagem)" alt="{{ item.quadrinho.nome }}" (error)="handleImageError($event)"/>
+            <div class="cart-item-info">
+              <h3>{{ item.quadrinho.nome }}</h3>
+              <p class="desc">{{ item.quadrinho.descricao }}</p>
+              <div class="cart-actions">
+                <span class="price">{{ item.quadrinho.preco | currency:'BRL':'symbol-narrow' }}</span>
+                <div class="qtd-control">
+                  <button mat-icon-button (click)="remover(item.quadrinho.id)"><mat-icon>remove</mat-icon></button>
+                  <span>{{ item.quantity }}</span>
+                  <button mat-icon-button (click)="adicionarAoCarrinho(item.quadrinho)"><mat-icon>add</mat-icon></button>
+                </div>
+                <button mat-button color="warn" (click)="removerTudo(item.quadrinho.id)">Remover</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="payment-summary">
+          <h3>Resumo do Pedido</h3>
+          <div class="total-row">
+            <span>Total:</span>
+            <strong>{{ total | currency:'BRL':'symbol-narrow' }}</strong>
+          </div>
+          <hr>
+          <h4>Forma de Pagamento</h4>
+          
+          <mat-radio-group [(ngModel)]="idPagamentoSelecionado" (change)="onPagamentoChange()" class="payment-options">
+            
+            <div class="payment-card" [class.selected]="idPagamentoSelecionado === 1">
+              <mat-radio-button [value]="1">Pix (Aprovação Automática)</mat-radio-button>
+              <div class="payment-details" *ngIf="idPagamentoSelecionado === 1">
+                <div style="text-align: center;">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=Westview" alt="QR Code">
+                    <p class="timer">{{ statusPix }}</p>
+                    <h2 style="color: #c62828;">{{ displayTempoPix }}</h2>
+                </div>
+              </div>
+            </div>
+
+            <div class="payment-card" [class.selected]="idPagamentoSelecionado === 2">
+              <mat-radio-button [value]="2">Boleto Bancário</mat-radio-button>
+              <div class="payment-details" *ngIf="idPagamentoSelecionado === 2">
+                <p>Gere o boleto para finalizar.</p>
+                <button mat-raised-button color="primary" class="full-width-btn" (click)="abrirBoleto()">
+                  <mat-icon>description</mat-icon> Gerar e Pagar Boleto
+                </button>
+              </div>
+            </div>
+
+            <div class="payment-card" [class.selected]="idPagamentoSelecionado === 3">
+              <mat-radio-button [value]="3">Cartão de Crédito</mat-radio-button>
+              <div class="payment-details" *ngIf="idPagamentoSelecionado === 3">
+                <form [formGroup]="cardForm" class="card-form">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Número</mat-label>
+                    <input matInput formControlName="numero" placeholder="0000...">
+                  </mat-form-field>
+                  <div class="row">
+                     <mat-form-field appearance="outline" class="half-width">
+                        <mat-label>Validade</mat-label>
+                        <input matInput formControlName="validade" placeholder="MM/AA">
+                      </mat-form-field>
+                      <mat-form-field appearance="outline" class="half-width">
+                        <mat-label>CVV</mat-label>
+                        <input matInput formControlName="cvv">
+                      </mat-form-field>
+                  </div>
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Nome</mat-label>
+                    <input matInput formControlName="nome">
+                  </mat-form-field>
+                </form>
+                <button mat-flat-button color="primary" class="btn-checkout" (click)="finalizarCompra()">
+                  Pagar com Cartão
+                </button>
+              </div>
+            </div>
+
+            <div class="payment-card" [class.selected]="idPagamentoSelecionado === 4">
+              <mat-radio-button [value]="4">Exemplo (Demonstração)</mat-radio-button>
+              <div class="payment-details" *ngIf="idPagamentoSelecionado === 4">
+                <p>Modo de apresentação: aprovação imediata.</p>
+                <button mat-flat-button color="accent" class="btn-checkout" (click)="finalizarCompra(true)">
+                  Finalizar Agora
+                </button>
+              </div>
+            </div>
+
+          </mat-radio-group>
+          
+          </div>
+
+      </div>
+    </ng-container>
+
+    <ng-template #emptyCart>
+      <div class="cart-empty">
+        <mat-icon>shopping_cart</mat-icon>
+        <h3>Seu carrinho está vazio</h3>
+        <a routerLink="/loja" mat-raised-button color="primary">Ir para a Loja</a>
+      </div>
+    </ng-template>
+  </ng-container>
+</div>
