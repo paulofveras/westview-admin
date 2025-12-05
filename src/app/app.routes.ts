@@ -21,6 +21,7 @@ import { usuarioResolver } from './resolvers/usuario.resolver';
 import { PerfilComponent } from './perfil/perfil.component';
 import { CadastroComponent } from './cadastro/cadastro.component';
 import { MeusPedidosComponent } from './meus-pedidos/meus-pedidos.component';
+import { QuadrinhoAdminListComponent } from './quadrinho-admin-list/quadrinho-admin-list';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -32,11 +33,11 @@ export const routes: Routes = [
   { path: 'meus-pedidos', component: MeusPedidosComponent, canActivate: [authGuard] },
   { path: 'dashboard', component: AdminDashboardComponent, canActivate: [authGuard] },
 
-  {
+{
     path: 'quadrinhos/list',
-    component: QuadrinhoListComponent,
+    component: QuadrinhoAdminListComponent, // NOVO COMPONENTE
     canActivate: [authGuard],
-    data: { roles: ['Funcionario', 'Cliente'], publicView: false }
+    data: { roles: ['Funcionario', 'Cliente'] } 
   },
   { path: 'quadrinhos/new', component: QuadrinhoFormComponent, canActivate: [authGuard] },
   {

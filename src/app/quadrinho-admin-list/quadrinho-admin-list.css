@@ -1,0 +1,59 @@
+.admin-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.admin-header h1 { margin: 0; font-size: 2rem; color: #333; }
+.admin-header p { margin: 5px 0 0; color: #666; }
+
+.filters { margin-bottom: 20px; }
+.search-field { width: 100%; max-width: 400px; }
+
+/* Tabela Estilizada */
+.table-wrapper {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+table { width: 100%; }
+
+th.mat-header-cell {
+  background: #f8f9fa;
+  font-weight: 700;
+  color: #555;
+  font-size: 0.9rem;
+  padding: 16px;
+}
+
+td.mat-cell { padding: 16px; vertical-align: middle; }
+
+/* Miniatura da Capa */
+.thumb-cover {
+  width: 50px;
+  height: 75px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #eee;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Tipografia da célula de nome */
+.title-text { display: block; font-weight: 600; font-size: 1rem; color: #333; }
+.subtitle-text { display: block; font-size: 0.85rem; color: #888; }
+
+.price-cell { font-weight: bold; color: #2c3e50; }
+
+.actions-col { text-align: right; white-space: nowrap; }
+
+/* Ajuste de hover na linha */
+tr.mat-row:hover { background-color: #fcfcfc; }

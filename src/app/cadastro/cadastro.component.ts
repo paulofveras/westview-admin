@@ -4,15 +4,28 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { CadastroService, CadastroBasicoDTO } from '../services/cadastro.service';
 
+// Novos Imports do Material
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+
 @Component({
   selector: 'app-cadastro',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [
+    CommonModule, ReactiveFormsModule, RouterModule,
+    MatStepperModule, MatInputModule, MatButtonModule, MatFormFieldModule
+  ],
   templateUrl: './cadastro.component.html',
   styleUrl: './cadastro.component.css'
 })
 export class CadastroComponent {
-  form: FormGroup;
+  // Criamos grupos separados para o Stepper controlar a validação de cada passo
+  pessoalForm: FormGroup;
+  contatoForm: FormGroup; // Inclui telefone e endereço
+  acessoForm: FormGroup;
+  
   isLoading = false;
 
   constructor(
@@ -20,81 +33,81 @@ export class CadastroComponent {
     private cadastroService: CadastroService,
     private router: Router
   ) {
-    this.form = this.fb.group({
+    // Passo 1: Quem é você?
+    this.pessoalForm = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(4)]],
-      cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]], // Validação simples de 11 dígitos
+      cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
       email: ['', [Validators.required, Validators.email]],
-      username: ['', Validators.required],
-      senha: ['', [Validators.required, Validators.minLength(3)]],
-      
+    });
+
+    // Passo 2: Onde te encontrar?
+    this.contatoForm = this.fb.group({
       telefone: this.fb.group({
         codigoArea: ['', [Validators.required, Validators.pattern(/^\d{2}$/)]],
         numero: ['', [Validators.required, Validators.pattern(/^\d{8,9}$/)]]
       }),
-      
       endereco: this.fb.group({
         cep: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
         rua: ['', Validators.required],
         numero: ['', Validators.required]
       })
     });
+
+    // Passo 3: Dados de Login
+    this.acessoForm = this.fb.group({
+      username: ['', Validators.required],
+      senha: ['', [Validators.required, Validators.minLength(3)]],
+    });
   }
 
-  // --- NOVO MÉTODO: Busca CEP e preenche endereço ---
   buscarCep() {
-    const cepControl = this.form.get('endereco.cep');
-    const cep = cepControl?.value;
+    // Acessa o controle dentro do grupo de contato -> endereço
+    const enderecoGroup = this.contatoForm.get('endereco') as FormGroup;
+    const cep = enderecoGroup.get('cep')?.value;
 
-    if (cep && cep.length === 8) {
-      // Desabilita o campo rua enquanto busca para dar feedback visual
-      this.form.get('endereco.rua')?.disable();
+    if (cep && String(cep).length === 8) {
+      enderecoGroup.get('rua')?.disable();
 
       this.cadastroService.consultarCep(cep).subscribe({
         next: (dados) => {
           if (!dados.erro) {
-            this.form.patchValue({
-              endereco: {
-                rua: dados.logradouro
-                // O backend atual só aceita Rua, CEP e Número.
-                // Se o backend aceitasse Bairro/Cidade/UF, preencheríamos aqui.
-              }
-            });
-            // Foca no número para facilitar a vida do usuário
+            enderecoGroup.patchValue({ rua: dados.logradouro });
             document.getElementById('numeroInput')?.focus();
           } else {
             alert('CEP não encontrado.');
           }
-          this.form.get('endereco.rua')?.enable();
+          enderecoGroup.get('rua')?.enable();
         },
         error: () => {
           alert('Erro ao buscar CEP.');
-          this.form.get('endereco.rua')?.enable();
+          enderecoGroup.get('rua')?.enable();
         }
       });
     }
   }
 
   onSubmit() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched(); // Faz os erros vermelhos aparecerem se clicar em salvar vazio
+    if (this.pessoalForm.invalid || this.contatoForm.invalid || this.acessoForm.invalid) {
       return;
     }
 
     this.isLoading = true;
     
-    // Precisamos reabilitar campos desabilitados (se houver) para o valor entrar no DTO
-    this.form.get('endereco.rua')?.enable();
-    
-    const dto = this.form.value as CadastroBasicoDTO;
+    // Remonta o DTO juntando os pedaços
+    const dto: CadastroBasicoDTO = {
+      ...this.pessoalForm.value,
+      ...this.contatoForm.value,
+      ...this.acessoForm.value
+    };
 
     this.cadastroService.cadastrar(dto).subscribe({
-      next: (cliente) => {
-        alert('Cadastro realizado com sucesso! Faça login para continuar.');
+      next: () => {
+        alert('Cadastro realizado! Faça login.');
         this.router.navigate(['/login']);
       },
       error: (err) => {
-        console.error('Erro no cadastro:', err);
-        alert('Erro ao realizar cadastro. Verifique os dados (ex: CPF já existente).');
+        console.error(err);
+        alert('Erro ao cadastrar.');
         this.isLoading = false;
       }
     });

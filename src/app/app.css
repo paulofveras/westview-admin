@@ -1,12 +1,19 @@
 header {
   background-color: var(--header-bg-color);
   color: var(--text-light-color);
-  padding: 0 30px; /* Removi o padding vertical para usar height fixa e alinhar melhor */
-  height: 70px;    /* Altura fixa para o header */
+  padding: 0 30px;
+  height: 70px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 5px var(--shadow-color);
+  
+  /* --- CORREÇÃO: Menu Fixo --- */
+  position: sticky;
+  top: 0;
+  z-index: 1000; /* Garante que fique por cima de tudo */
+  width: 100%;
+  box-sizing: border-box; /* Evita que o padding estoure a largura */
 }
 
 .header-title-link {

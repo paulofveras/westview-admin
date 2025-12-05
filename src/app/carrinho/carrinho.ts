@@ -11,15 +11,16 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog'; // Novo import
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
-// --- IMPORTS CORRIGIDOS AQUI ---
+// Imports do Projeto (caminhos corrigidos para a pasta carrinho)
 import { CartItem, CartService } from '../services/cart.service';
 import { AuthService } from '../services/auth.service';
 import { PedidoService, PedidoDTO } from '../services/pedido.service';
-import { Quadrinho } from '../models/quadrinho.model'; 
+import { Quadrinho } from '../models/quadrinho.model';
 import { BoletoDialogComponent } from './boleto-dialog.component';
-// -------------------------------
+
 @Component({
   selector: 'app-carrinho',
   standalone: true,
@@ -34,9 +35,10 @@ import { BoletoDialogComponent } from './boleto-dialog.component';
     MatIconModule,
     MatInputModule,
     MatFormFieldModule,
-    MatDialogModule // Novo
+    MatDialogModule,
+    MatSnackBarModule
   ],
-  templateUrl: './carrinho.html', 
+  templateUrl: './carrinho.html',
   styleUrls: ['./carrinho.css']
 })
 export class CarrinhoComponent implements OnInit, OnDestroy {
@@ -44,17 +46,20 @@ export class CarrinhoComponent implements OnInit, OnDestroy {
   total = 0;
   totalItens = 0;
   
-  idPagamentoSelecionado: number = 1; 
-  isProcessing = false; 
-  compraRealizada = false; 
+  // Controle de UI
+  idPagamentoSelecionado: number = 1; // 1=Pix, 2=Boleto, 3=Cartao, 4=Exemplo
+  isProcessing = false;
+  compraRealizada = false;
 
-  // Pix
+  // Controle do Pix
   tempoPixRestante = 10; // 10 segundos para demonstração rápida!
   displayTempoPix = '00:10';
   pixInterval: any;
   statusPix = 'Aguardando pagamento...';
 
+  // Formulário do Cartão
   cardForm: FormGroup;
+
   readonly placeholderImage = 'assets/images/placeholder-comic.svg';
   private subscription = new Subscription();
 
@@ -64,7 +69,8 @@ export class CarrinhoComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private fb: FormBuilder,
-    private dialog: MatDialog // Injeção do Dialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {
     this.cardForm = this.fb.group({
       numero: ['', [Validators.required, Validators.minLength(16)]],
@@ -91,18 +97,30 @@ export class CarrinhoComponent implements OnInit, OnDestroy {
     this.pararTimerPix();
   }
 
-  // ... (Métodos getUrlImagem, handleImageError, adicionarAoCarrinho, remover... iguais ao anterior) ...
+  // Auxiliares
   getUrlImagem(nomeImagem?: string): string {
     if (!nomeImagem) return this.placeholderImage;
     return `http://localhost:8080/quadrinhos/image/download/${nomeImagem}`;
   }
-  handleImageError(event: any): void { event.target.src = this.placeholderImage; }
-  adicionarAoCarrinho(quadrinho: Quadrinho): void { this.cartService.addItem(quadrinho); }
+
+  handleImageError(event: any): void {
+    event.target.src = this.placeholderImage;
+  }
+
+  // Ações do Carrinho
+  adicionarAoCarrinho(quadrinho: Quadrinho): void {
+    this.cartService.addItem(quadrinho);
+    this.snackBar.open('+1 unidade adicionada!', 'OK', {
+      duration: 2000,
+      verticalPosition: 'top'
+    });
+  }
+
   remover(id: number) { this.cartService.removeItem(id); }
   removerTudo(id: number) { this.cartService.deleteItem(id); }
   limpar() { this.cartService.clear(); }
-  // ...
 
+  // Lógica de Pagamento
   onPagamentoChange() {
     this.pararTimerPix();
     if (this.idPagamentoSelecionado === 1) {
@@ -113,6 +131,7 @@ export class CarrinhoComponent implements OnInit, OnDestroy {
   iniciarTimerPix() {
     this.tempoPixRestante = 10; // 10s para o professor ver
     this.statusPix = 'Aguardando confirmação do banco...';
+    this.displayTempoPix = '00:10';
     
     this.pixInterval = setInterval(() => {
       this.tempoPixRestante--;
@@ -162,13 +181,17 @@ export class CarrinhoComponent implements OnInit, OnDestroy {
     }
 
     const usuario = this.authService.getUsuarioLogado();
-    if (!usuario || !usuario.id) return;
+    if (!usuario || !usuario.id) {
+        alert('Erro ao identificar usuário logado.');
+        return;
+    }
 
     this.isProcessing = true;
 
     const pedidoDTO: PedidoDTO = {
       idCliente: usuario.id,
-      idPagamento: this.idPagamentoSelecionado === 4 ? 1 : this.idPagamentoSelecionado, // Exemplo usa ID 1 (Pix) pro backend nao quebrar
+      // Se for "Exemplo" (4), manda como Pix (1) pro backend não reclamar
+      idPagamento: this.idPagamentoSelecionado === 4 ? 1 : this.idPagamentoSelecionado,
       itens: this.items.map(item => ({
         quantidade: item.quantity,
         desconto: 0.0,
@@ -176,7 +199,7 @@ export class CarrinhoComponent implements OnInit, OnDestroy {
       }))
     };
 
-    // Simula delay de processamento
+    // Simula delay de processamento para dar "emoção"
     setTimeout(() => {
       this.pedidoService.save(pedidoDTO).subscribe({
         next: () => {
@@ -187,7 +210,7 @@ export class CarrinhoComponent implements OnInit, OnDestroy {
         error: (err) => {
           console.error(err);
           this.isProcessing = false;
-          alert('Erro na transação.');
+          alert('Erro na transação. Tente novamente.');
         }
       });
     }, 1500);

@@ -9,124 +9,27 @@
 
 .cadastro-card {
   background: white;
-  padding: 30px;
+  padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   width: 100%;
-  max-width: 600px;
+  max-width: 700px; /* Um pouco mais largo para o stepper */
 }
 
-h2 {
-  margin: 0;
-  text-align: center;
-  color: #333;
-}
+h2 { text-align: center; color: #333; margin-bottom: 10px; }
 
-.subtitle {
-  text-align: center;
-  color: #666;
-  margin-bottom: 30px;
-}
+.full-width { width: 100%; margin-bottom: 5px; }
+.row { display: flex; justify-content: space-between; gap: 10px; }
 
-.section-title {
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  color: #e63946;
-  font-weight: bold;
-  margin: 20px 0 10px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 5px;
-}
-
-.form-row {
+.step-actions {
   display: flex;
-  gap: 15px;
-}
-
-.form-group {
-  margin-bottom: 15px;
-  flex: 1;
-}
-
-.full-width {
-  width: 100%;
-}
-
-.small {
-  flex: 0 0 80px;
-}
-
-label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: 500;
-  font-size: 0.9rem;
-  color: #555;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-sizing: border-box;
-}
-
-input:focus {
-  border-color: #e63946;
-  outline: none;
-}
-
-.actions {
-  margin-top: 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  align-items: center;
-}
-
-.btn-primary {
-  background-color: #e63946;
-  color: white;
-  padding: 12px 40px;
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  width: 100%;
-}
-
-.btn-primary:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+  justify-content: flex-end;
+  margin-top: 20px;
+  gap: 10px;
 }
 
 .link-login {
-  color: #007bff;
+  color: #e63946;
   text-decoration: none;
-  font-size: 0.9rem;
-}
-
-.link-login:hover {
-  text-decoration: underline;
-}
-
-.error-msg {
-  color: #c62828; /* Vermelho padrão do seu tema */
-  font-size: 0.75rem;
-  margin-top: 4px;
-  display: block;
   font-weight: 500;
-}
-
-/* Ajuste para o campo de CEP não ficar tão pequeno */
-.small-cep {
-  flex: 0 0 100px;
-}
-
-/* Melhorar feedback visual dos inputs inválidos */
-input.ng-invalid.ng-touched {
-  border-color: #c62828;
-  background-color: rgba(198, 40, 40, 0.03);
 }

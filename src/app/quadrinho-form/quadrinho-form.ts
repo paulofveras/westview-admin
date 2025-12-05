@@ -10,17 +10,32 @@ import { QuadrinhoService } from '../services/quadrinho.service';
 import { FornecedorService } from '../services/fornecedor.service';
 import { AuthService } from '../services/auth.service';
 
+// Material Imports
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+
 @Component({
   selector: 'app-quadrinho-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [
+    CommonModule, ReactiveFormsModule, RouterModule,
+    MatStepperModule, MatInputModule, MatButtonModule, MatSelectModule, MatFormFieldModule
+  ],
   templateUrl: './quadrinho-form.html',
   styleUrls: ['./quadrinho-form.css']
 })
 export class QuadrinhoFormComponent implements OnInit, OnDestroy {
-
-  formGroup: FormGroup;
+  // Grupos para o Stepper
+  basicoForm: FormGroup;
+  detalhesForm: FormGroup; // Preço, Estoque, Páginas
+  relacionamentoForm: FormGroup; // Fornecedor, Material
+  
   isEditMode: boolean = false;
+  quadrinhoId: number | null = null;
+  
   fornecedores: Fornecedor[] = [];
   materiais: Material[] = [];
   
@@ -28,29 +43,32 @@ export class QuadrinhoFormComponent implements OnInit, OnDestroy {
   imagePreview: string | ArrayBuffer | null = null;
   private previewObjectUrl?: string;
 
-  constructor(private formBuilder: FormBuilder,
-              private quadrinhoService: QuadrinhoService,
-              private fornecedorService: FornecedorService,
-              private materialService: MaterialService, // Injete o serviço
-              private router: Router,
-              private activatedRoute: ActivatedRoute,
-              private authService: AuthService) {
+  constructor(
+    private fb: FormBuilder,
+    private quadrinhoService: QuadrinhoService,
+    private fornecedorService: FornecedorService,
+    private materialService: MaterialService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private authService: AuthService
+  ) {
+    // Grupo 1
+    this.basicoForm = this.fb.group({
+      nome: ['', Validators.required],
+      descricao: ['', Validators.required]
+    });
 
-    const quadrinho: Quadrinho = this.activatedRoute.snapshot.data['quadrinho'];
-    this.isEditMode = (quadrinho && quadrinho.id) ? true : false;
+    // Grupo 2
+    this.detalhesForm = this.fb.group({
+      preco: [0, Validators.required],
+      estoque: [0, Validators.required],
+      quantPaginas: [0]
+    });
 
-    if (this.isEditMode && quadrinho.nomeImagem) {
-      this.loadExistingImage(quadrinho.nomeImagem);
-    }
-
-    this.formGroup = formBuilder.group({
-      id: [quadrinho?.id],
-      nome: [quadrinho?.nome, Validators.required],
-      descricao: [quadrinho?.descricao, Validators.required],
-      preco: [quadrinho?.preco, Validators.required],
-      estoque: [quadrinho?.estoque, Validators.required],
-      idFornecedor: [quadrinho?.fornecedor?.id, Validators.required],
-      idMaterial: [quadrinho?.material?.id, Validators.required]
+    // Grupo 3
+    this.relacionamentoForm = this.fb.group({
+      idFornecedor: [null, Validators.required],
+      idMaterial: [null, Validators.required]
     });
   }
 
@@ -60,37 +78,36 @@ export class QuadrinhoFormComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Busca os fornecedores E os materiais quando o componente inicia
-    this.fornecedorService.findAll().subscribe(data => {
-      this.fornecedores = data;
-    });
+    this.fornecedorService.findAll().subscribe(data => this.fornecedores = data);
+    this.materialService.findAll().subscribe(data => this.materiais = data);
 
-    this.materialService.findAll().subscribe(data => {
-      this.materiais = data;
-    });
+    const quadrinho: Quadrinho = this.activatedRoute.snapshot.data['quadrinho'];
+    if (quadrinho && quadrinho.id) {
+      this.isEditMode = true;
+      this.quadrinhoId = quadrinho.id;
+
+      this.basicoForm.patchValue({
+        nome: quadrinho.nome,
+        descricao: quadrinho.descricao
+      });
+      this.detalhesForm.patchValue({
+        preco: quadrinho.preco,
+        estoque: quadrinho.estoque,
+        quantPaginas: quadrinho.quantPaginas
+      });
+      this.relacionamentoForm.patchValue({
+        idFornecedor: quadrinho.fornecedor?.id,
+        idMaterial: quadrinho.material?.id
+      });
+
+      if (quadrinho.nomeImagem) {
+        this.loadExistingImage(quadrinho.nomeImagem);
+      }
+    }
   }
   
   ngOnDestroy(): void {
     this.revokePreviewUrl();
-  }
-
-  // O método salvar permanece o mesmo, pois o formGroup já inclui o idMaterial
-  salvar() {
-    if (this.formGroup.valid) {
-      const quadrinho = this.formGroup.value;
-
-      if (this.isEditMode) {
-        this.quadrinhoService.update(quadrinho).subscribe({
-          next: () => this.handlePostSave(quadrinho.id),
-          error: (err) => console.log('Erro ao atualizar dados do quadrinho' + JSON.stringify(err))
-        });
-      } else {
-        this.quadrinhoService.save(quadrinho).subscribe({
-          next: (quadrinhoSalvo) => this.handlePostSave(quadrinhoSalvo?.id),
-          error: (err) => console.log('Erro ao salvar dados do quadrinho' + JSON.stringify(err))
-        });
-      }
-    }
   }
 
   onFileSelected(event: any): void {
@@ -104,24 +121,50 @@ export class QuadrinhoFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  excluir() {
+  // --- CORREÇÃO AQUI ---
+  salvar() {
+    // Marca todos como tocados para mostrar erros se estiver inválido
+    if (this.basicoForm.invalid || this.detalhesForm.invalid || this.relacionamentoForm.invalid) {
+      this.basicoForm.markAllAsTouched();
+      this.detalhesForm.markAllAsTouched();
+      this.relacionamentoForm.markAllAsTouched();
+      return;
+    }
+
+    const quadrinho = {
+      id: this.quadrinhoId,
+      ...this.basicoForm.value,
+      ...this.detalhesForm.value,
+      ...this.relacionamentoForm.value
+    };
+
     if (this.isEditMode) {
-      if (confirm('Tem certeza que deseja excluir este quadrinho?')) {
-        const quadrinho = this.formGroup.value;
-        this.quadrinhoService.delete(quadrinho).subscribe({
-          next: () => this.router.navigateByUrl('/quadrinhos/list'),
-          error: (err) => console.log('Erro ao Excluir' + JSON.stringify(err))
-        });
-      }
+      // Update retorna void, não tem 'res'
+      this.quadrinhoService.update(quadrinho).subscribe({
+        next: () => {
+          // Se editou, já temos o ID
+          this.handlePostSave(this.quadrinhoId!);
+        },
+        error: (err: any) => console.log('Erro ao atualizar', err)
+      });
+    } else {
+      // Save retorna o Quadrinho com ID
+      this.quadrinhoService.save(quadrinho).subscribe({
+        next: (res: Quadrinho) => {
+          this.handlePostSave(res.id);
+        },
+        error: (err: any) => console.log('Erro ao salvar', err)
+      });
     }
   }
+  // ---------------------
 
-  private handlePostSave(idQuadrinho?: number): void {
-    if (this.selectedFile && idQuadrinho) {
+  private handlePostSave(idQuadrinho: number): void {
+    if (this.selectedFile) {
       this.quadrinhoService.uploadImagem(idQuadrinho, this.selectedFile.name, this.selectedFile)
         .subscribe({
           next: () => this.router.navigateByUrl('/quadrinhos/list'),
-          error: (err) => console.log('Erro ao fazer upload da imagem', err)
+          error: (err) => console.log('Erro imagem', err)
         });
     } else {
       this.router.navigateByUrl('/quadrinhos/list');
@@ -135,7 +178,7 @@ export class QuadrinhoFormComponent implements OnInit, OnDestroy {
         this.previewObjectUrl = URL.createObjectURL(blob);
         this.imagePreview = this.previewObjectUrl;
       },
-      error: (err) => console.log('Erro ao carregar imagem do quadrinho', err)
+      error: (err) => console.log('Erro img', err)
     });
   }
 
@@ -144,5 +187,13 @@ export class QuadrinhoFormComponent implements OnInit, OnDestroy {
       URL.revokeObjectURL(this.previewObjectUrl);
       this.previewObjectUrl = undefined;
     }
+  }
+
+  excluir() {
+      if (this.quadrinhoId && confirm('Excluir?')) {
+          this.quadrinhoService.delete({ id: this.quadrinhoId } as Quadrinho).subscribe(() => {
+              this.router.navigateByUrl('/quadrinhos/list');
+          });
+      }
   }
 }

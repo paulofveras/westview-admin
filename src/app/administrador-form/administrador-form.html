@@ -1,116 +1,112 @@
 <div class="form-container">
   <h2>{{ isEditMode ? 'Editando Administrador' : 'Novo Administrador' }}</h2>
   
-  <form [formGroup]="formGroup" class="form-grid">
-    <div class="form-field">
-      <label>Nome</label>
-      <input type="text" formControlName="nome" placeholder="Nome Completo">
-      <small class="error-msg" *ngIf="formGroup.get('nome')?.invalid && formGroup.get('nome')?.touched">
-        Mínimo de 3 caracteres.
-      </small>
-    </div>
+  <mat-stepper [linear]="false" orientation="vertical" #stepper>
+    
+    <mat-step [stepControl]="pessoalForm">
+        <form [formGroup]="pessoalForm">
+            <ng-template matStepLabel>Dados Pessoais</ng-template>
+            <div style="margin-top: 20px;"></div>
+            
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Nome</mat-label>
+                <input matInput formControlName="nome">
+                <mat-error>Mínimo 3 caracteres</mat-error>
+            </mat-form-field>
 
-    <div class="form-row">
-      <div class="form-field full-width">
-        <label>CPF</label>
-        <input type="text" formControlName="cpf" placeholder="Apenas números (11 dígitos)" maxlength="11">
-        <small class="error-msg" *ngIf="formGroup.get('cpf')?.invalid && formGroup.get('cpf')?.touched">
-          Deve conter 11 dígitos.
-        </small>
-      </div>
-      <div class="form-field full-width">
-        <label>Email</label>
-        <input type="email" formControlName="email" placeholder="admin@westview.com">
-        <small class="error-msg" *ngIf="formGroup.get('email')?.invalid && formGroup.get('email')?.touched">
-          Email inválido.
-        </small>
-      </div>
-    </div>
+            <div class="row">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>CPF</mat-label>
+                    <input matInput formControlName="cpf">
+                    <mat-error>CPF inválido</mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Email</mat-label>
+                    <input matInput formControlName="email">
+                    <mat-error>Email inválido</mat-error>
+                </mat-form-field>
+            </div>
 
-    <div class="form-row">
-        <div class="form-field full-width">
-            <label>Cargo</label>
-            <input type="text" formControlName="cargo" placeholder="Ex: Gerente Geral">
-            <small class="error-msg" *ngIf="formGroup.get('cargo')?.invalid && formGroup.get('cargo')?.touched">
-              Obrigatório.
-            </small>
-        </div>
-        <div class="form-field full-width">
-            <label>Nível de Acesso</label>
-            <input type="text" formControlName="nivelAcesso" placeholder="Ex: TOTAL">
-            <small class="error-msg" *ngIf="formGroup.get('nivelAcesso')?.invalid && formGroup.get('nivelAcesso')?.touched">
-              Obrigatório.
-            </small>
-        </div>
-    </div>
+            <div class="row">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Cargo</mat-label>
+                    <input matInput formControlName="cargo">
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Nível de Acesso</mat-label>
+                    <input matInput formControlName="nivelAcesso">
+                </mat-form-field>
+            </div>
 
-    <div class="form-field">
-      <label>Usuário (Login)</label>
-      <input type="text" formControlName="username">
-      <small class="error-msg" *ngIf="formGroup.get('username')?.invalid && formGroup.get('username')?.touched">
-        Obrigatório (min 3 caracteres).
-      </small>
-    </div>
+            <div class="form-actions">
+                <button mat-button color="warn" *ngIf="isEditMode" (click)="excluir()">Excluir</button>
+                <button mat-flat-button color="primary" matStepperNext>Próximo</button>
+            </div>
+        </form>
+    </mat-step>
 
-    <div class="form-field">
-      <label>Senha <span *ngIf="isEditMode" style="font-weight:normal; font-size:0.8em">(opcional na edição)</span></label>
-      <input type="password" formControlName="senha">
-      <small class="error-msg" *ngIf="formGroup.get('senha')?.invalid && formGroup.get('senha')?.touched">
-        Obrigatória na criação.
-      </small>
-    </div>
+    <mat-step [stepControl]="acessoForm">
+        <form [formGroup]="acessoForm">
+            <ng-template matStepLabel>Dados de Acesso</ng-template>
+            <div style="margin-top: 20px;"></div>
 
-    <fieldset formGroupName="endereco" class="fieldset-group">
-      <legend>Endereço</legend>
-      <div class="form-row">
-        <div class="form-field small-field">
-          <label>CEP</label>
-          <input type="text" formControlName="cep" placeholder="00000000" maxlength="8" (blur)="buscarCep()">
-          <small class="error-msg" *ngIf="formGroup.get('endereco.cep')?.invalid && formGroup.get('endereco.cep')?.touched">
-            8 dígitos.
-          </small>
-        </div>
-        <div class="form-field full-width">
-          <label>Rua</label>
-          <input type="text" formControlName="rua" placeholder="Automático...">
-          <small class="error-msg" *ngIf="formGroup.get('endereco.rua')?.invalid && formGroup.get('endereco.rua')?.touched">
-            Obrigatório.
-          </small>
-        </div>
-        <div class="form-field small-field">
-          <label>Número</label>
-          <input type="number" id="numeroInputAdmin" formControlName="numero">
-          <small class="error-msg" *ngIf="formGroup.get('endereco.numero')?.invalid && formGroup.get('endereco.numero')?.touched">
-            Obrig.
-          </small>
-        </div>
-      </div>
-    </fieldset>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Usuário</mat-label>
+                <input matInput formControlName="username">
+                <mat-error>Mínimo 3 caracteres</mat-error>
+            </mat-form-field>
 
-    <fieldset formGroupName="telefone" class="fieldset-group">
-      <legend>Telefone</legend>
-      <div class="form-row">
-        <div class="form-field small-field">
-          <label>DDD</label>
-          <input type="text" formControlName="codigoArea" placeholder="XX" maxlength="2">
-          <small class="error-msg" *ngIf="formGroup.get('telefone.codigoArea')?.invalid && formGroup.get('telefone.codigoArea')?.touched">
-            2 dígitos.
-          </small>
-        </div>
-        <div class="form-field full-width">
-          <label>Número</label>
-          <input type="text" formControlName="numero" placeholder="9XXXX-XXXX">
-          <small class="error-msg" *ngIf="formGroup.get('telefone.numero')?.invalid && formGroup.get('telefone.numero')?.touched">
-            Inválido.
-          </small>
-        </div>
-      </div>
-    </fieldset>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Senha</mat-label>
+                <input matInput type="password" formControlName="senha">
+            </mat-form-field>
 
-    <div class="form-actions">
-      <button (click)="salvar()" [disabled]="formGroup.invalid" class="btn-primary">Salvar</button>
-      <button (click)="excluir()" *ngIf="isEditMode" class="btn-danger">Excluir</button>
-      <a routerLink="/administradores/list" class="btn-secondary">Cancelar</a>
-    </div>
-  </form>
+            <div class="form-actions">
+                <button mat-button matStepperPrevious>Voltar</button>
+                <button mat-flat-button color="primary" matStepperNext>Próximo</button>
+            </div>
+        </form>
+    </mat-step>
+
+    <mat-step [stepControl]="contatoForm">
+        <form [formGroup]="contatoForm">
+            <ng-template matStepLabel>Endereço e Contato</ng-template>
+            <div style="margin-top: 20px;"></div>
+
+            <div formGroupName="endereco">
+                <div class="row">
+                    <mat-form-field appearance="outline" style="width: 120px;">
+                        <mat-label>CEP</mat-label>
+                        <input matInput formControlName="cep" (blur)="buscarCep()">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" style="flex: 1;">
+                        <mat-label>Rua</mat-label>
+                        <input matInput formControlName="rua">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" style="width: 100px;">
+                        <mat-label>Nº</mat-label>
+                        <input matInput formControlName="numero">
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <div formGroupName="telefone" class="row">
+                <mat-form-field appearance="outline" style="width: 90px;">
+                    <mat-label>DDD</mat-label>
+                    <input matInput formControlName="codigoArea">
+                </mat-form-field>
+                <mat-form-field appearance="outline" style="flex: 1;">
+                    <mat-label>Número</mat-label>
+                    <input matInput formControlName="numero">
+                </mat-form-field>
+            </div>
+
+            <div class="form-actions">
+                <button mat-button matStepperPrevious>Voltar</button>
+                <button mat-raised-button color="accent" (click)="salvar()">SALVAR ADMIN</button>
+            </div>
+        </form>
+    </mat-step>
+
+  </mat-stepper>
 </div>

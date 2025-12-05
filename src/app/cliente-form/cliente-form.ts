@@ -1,121 +1,132 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Cliente } from '../models/pessoa.model';
 import { ClienteService } from '../services/cliente.service';
-import { EnderecoService } from '../services/endereco.service'; // Importe o novo serviço
+import { EnderecoService } from '../services/endereco.service';
+import { Cliente } from '../models/pessoa.model';
+
+// Material Imports
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
   selector: 'app-cliente-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    RouterModule, 
+    MatStepperModule, 
+    MatInputModule, 
+    MatButtonModule, 
+    MatFormFieldModule
+  ],
   templateUrl: './cliente-form.html',
-  styleUrl: './cliente-form.css'
+  styleUrls: ['./cliente-form.css']
 })
 export class ClienteFormComponent implements OnInit {
-  formGroup!: FormGroup;
-  isEdit = false;
+  // Grupos do Stepper
+  pessoalForm!: FormGroup;
+  acessoForm!: FormGroup;
+  contatoForm!: FormGroup;
+  
+  isEdit: boolean = false;
+  clienteId: number | null = null;
 
   constructor(
     private fb: FormBuilder,
     private clienteService: ClienteService,
-    private enderecoService: EnderecoService, // Injete aqui
+    private enderecoService: EnderecoService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    const cliente: Cliente | undefined = this.route.snapshot.data['cliente'];
-    this.isEdit = !!cliente && !!cliente.id;
-    const username = cliente?.username ?? cliente?.usuario?.username ?? '';
+    // Grupo 1: Dados Pessoais
+    this.pessoalForm = this.fb.group({
+      nome: ['', [Validators.required, Validators.minLength(2)]],
+      cpf: ['', [Validators.required, Validators.minLength(11)]],
+      email: ['', [Validators.email]]
+    });
 
-    this.formGroup = this.fb.group({
-      id: [cliente?.id ?? null],
-      nome: [cliente?.nome ?? '', [Validators.required, Validators.minLength(2)]],
-      cpf: [cliente?.cpf ?? '', [Validators.required, Validators.minLength(11)]],
-      email: [cliente?.email ?? '', [Validators.email]],
-      username: [username, [Validators.required, Validators.minLength(3)]],
-      senha: [''], // Senha não é obrigatória na edição (tratado no salvar)
-      
+    // Grupo 2: Acesso
+    this.acessoForm = this.fb.group({
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      senha: ['']
+    });
+
+    // Grupo 3: Contato
+    this.contatoForm = this.fb.group({
       endereco: this.fb.group({
-        cep: [cliente?.endereco?.cep ?? '', [Validators.required, Validators.pattern(/^\d{8}$/)]],
-        rua: [cliente?.endereco?.rua ?? '', Validators.required],
-        numero: [cliente?.endereco?.numero ?? '', Validators.required]
+        cep: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
+        rua: ['', Validators.required],
+        numero: ['', Validators.required]
       }),
-      
       telefone: this.fb.group({
-        codigoArea: [cliente?.telefone?.codigoArea ?? '', [Validators.required, Validators.pattern(/^\d{2}$/)]],
-        numero: [cliente?.telefone?.numero ?? '', [Validators.required, Validators.minLength(8)]]
+        codigoArea: ['', [Validators.required, Validators.pattern(/^\d{2}$/)]],
+        numero: ['', [Validators.required, Validators.minLength(8)]]
       })
     });
 
-    // Se for criação, senha é obrigatória
-    if (!this.isEdit) {
-      this.formGroup.get('senha')?.addValidators(Validators.required);
+    const cliente: Cliente = this.route.snapshot.data['cliente'];
+    if (cliente && cliente.id) {
+      this.isEdit = true;
+      this.clienteId = cliente.id;
+      const username = cliente.username ?? cliente.usuario?.username ?? '';
+
+      this.pessoalForm.patchValue({ nome: cliente.nome, cpf: cliente.cpf, email: cliente.email });
+      this.acessoForm.patchValue({ username: username });
+      this.contatoForm.patchValue({ endereco: cliente.endereco, telefone: cliente.telefone });
+    } else {
+      this.acessoForm.get('senha')?.addValidators(Validators.required);
     }
   }
 
-  // --- Lógica de CEP ---
   buscarCep() {
-    const cepControl = this.formGroup.get('endereco.cep');
-    const cep = cepControl?.value;
-
+    const group = this.contatoForm.get('endereco') as FormGroup;
+    const cep = group.get('cep')?.value;
     if (cep && String(cep).length === 8) {
-      this.formGroup.get('endereco.rua')?.disable(); // Feedback visual
-
-      this.enderecoService.consultarCep(cep).subscribe({
-        next: (dados) => {
-          if (!dados.erro) {
-            this.formGroup.get('endereco')?.patchValue({
-              rua: dados.logradouro
-            });
-            // Foca no número para agilizar
-            document.getElementById('numeroInput')?.focus();
-          } else {
-            alert('CEP não encontrado.');
-          }
-          this.formGroup.get('endereco.rua')?.enable();
-        },
-        error: () => {
-          alert('Erro ao buscar CEP.');
-          this.formGroup.get('endereco.rua')?.enable();
-        }
+      this.enderecoService.consultarCep(cep).subscribe(d => {
+        if(!d.erro) group.patchValue({ rua: d.logradouro });
       });
     }
   }
 
-  salvar(): void {
-    if (this.formGroup.invalid) {
-      this.formGroup.markAllAsTouched();
-      return;
+  salvar() {
+    if (this.pessoalForm.invalid || this.acessoForm.invalid || this.contatoForm.invalid) {
+        this.pessoalForm.markAllAsTouched();
+        this.acessoForm.markAllAsTouched();
+        this.contatoForm.markAllAsTouched();
+        return;
     }
-    // Reabilita campos para garantir que o valor seja enviado
-    this.formGroup.enable(); 
 
-    const value = this.formGroup.value as Cliente;
-    if (!value.id) {
-      this.clienteService.create(value).subscribe({
+    const cliente = {
+      id: this.clienteId,
+      ...this.pessoalForm.value,
+      ...this.acessoForm.value,
+      ...this.contatoForm.value
+    };
+
+    if (this.isEdit) {
+      this.clienteService.update(cliente.id, cliente).subscribe({
         next: () => this.router.navigateByUrl('/clientes/list'),
-        error: (error) => {
-            console.error('Erro ao criar cliente', error);
-            alert('Erro ao salvar. Verifique se o CPF ou Username já existem.');
-        }
+        error: (e: any) => alert('Erro ao salvar cliente.')
       });
     } else {
-      this.clienteService.update(value.id, value).subscribe({
+      this.clienteService.create(cliente).subscribe({
         next: () => this.router.navigateByUrl('/clientes/list'),
-        error: (error) => console.error('Erro ao atualizar cliente', error)
+        error: (e: any) => alert('Erro ao salvar cliente.')
       });
     }
   }
 
-  excluir(): void {
-    const id = this.formGroup.get('id')?.value;
-    if (id && confirm('Deseja realmente excluir este cliente?')) {
-      this.clienteService.delete(id).subscribe({
-        next: () => this.router.navigateByUrl('/clientes/list'),
-        error: (error) => console.error('Erro ao excluir cliente', error)
+  excluir() {
+    if (this.isEdit && this.clienteId && confirm('Excluir cliente?')) {
+      this.clienteService.delete(this.clienteId).subscribe(() => {
+        this.router.navigateByUrl('/clientes/list');
       });
     }
   }

@@ -1,67 +1,88 @@
 <div class="form-container">
-  <h2>{{ isEditMode ? 'Editando Quadrinho' : 'Novo Quadrinho' }}</h2>
+  <h2>{{ isEditMode ? 'Editando: ' + basicoForm.get('nome')?.value : 'Novo Quadrinho' }}</h2>
 
-  <form [formGroup]="formGroup">
-    <div class="form-grid" style="grid-template-columns: 2fr 1fr;"> <div class="form-column">
-        <div class="form-field">
-          <label>Título</label>
-          <input type="text" formControlName="nome">
-          <small class="error-msg" *ngIf="formGroup.get('nome')?.invalid && formGroup.get('nome')?.touched">
-            Obrigatório.
-          </small>
+  <mat-stepper [linear]="false" orientation="vertical" #stepper>
+    
+    <mat-step [stepControl]="basicoForm">
+      <form [formGroup]="basicoForm">
+        <ng-template matStepLabel>Informações Básicas</ng-template>
+        <div style="margin-top: 20px;"></div>
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Título</mat-label>
+            <input matInput formControlName="nome">
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descrição</mat-label>
+            <textarea matInput formControlName="descricao" rows="3"></textarea>
+        </mat-form-field>
+        <div class="form-actions">
+            <button mat-button color="warn" *ngIf="isEditMode" (click)="excluir()">Excluir</button>
+            <button mat-flat-button color="primary" matStepperNext>Próximo</button>
         </div>
+      </form>
+    </mat-step>
 
-        <div class="form-field">
-          <label>Descrição</label>
-          <textarea formControlName="descricao" rows="5"></textarea>
-          <small class="error-msg" *ngIf="formGroup.get('descricao')?.invalid && formGroup.get('descricao')?.touched">
-            Obrigatório.
-          </small>
+    <mat-step [stepControl]="detalhesForm">
+      <form [formGroup]="detalhesForm">
+        <ng-template matStepLabel>Preço e Estoque</ng-template>
+        <div style="margin-top: 20px;"></div>
+        <div class="row">
+            <mat-form-field appearance="outline">
+                <mat-label>Preço (R$)</mat-label>
+                <input matInput type="number" formControlName="preco">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Estoque</mat-label>
+                <input matInput type="number" formControlName="estoque">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Páginas</mat-label>
+                <input matInput type="number" formControlName="quantPaginas">
+            </mat-form-field>
         </div>
+        <div class="form-actions">
+            <button mat-button matStepperPrevious>Voltar</button>
+            <button mat-flat-button color="primary" matStepperNext>Próximo</button>
+        </div>
+      </form>
+    </mat-step>
 
-        <div class="form-row">
-            <div class="form-field full-width">
-                <label>Preço (R$)</label>
-                <input type="number" formControlName="preco">
+    <mat-step [stepControl]="relacionamentoForm">
+        <form [formGroup]="relacionamentoForm">
+            <ng-template matStepLabel>Detalhes Técnicos</ng-template>
+            <div style="margin-top: 20px;"></div>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Fornecedor</mat-label>
+                <mat-select formControlName="idFornecedor">
+                    <mat-option *ngFor="let f of fornecedores" [value]="f.id">{{ f.nome }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Material</mat-label>
+                <mat-select formControlName="idMaterial">
+                    <mat-option *ngFor="let m of materiais" [value]="m.id">{{ m.nome }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <div class="form-actions">
+                <button mat-button matStepperPrevious>Voltar</button>
+                <button mat-flat-button color="primary" matStepperNext>Ir para Capa</button>
             </div>
-            <div class="form-field full-width">
-                <label>Estoque</label>
-                <input type="number" formControlName="estoque">
+        </form>
+    </mat-step>
+
+    <mat-step>
+        <ng-template matStepLabel>Capa do Quadrinho</ng-template>
+        <div class="image-upload-area">
+            <div *ngIf="imagePreview" class="preview-box">
+                <img [src]="imagePreview" alt="Capa">
             </div>
+            <p>Selecione a imagem da capa:</p>
+            <input type="file" (change)="onFileSelected($event)" accept="image/*">
         </div>
-
-        <div class="form-field">
-          <label>Fornecedor</label>
-          <select formControlName="idFornecedor">
-            <option [ngValue]="null" disabled>Selecione...</option>
-            <option *ngFor="let f of fornecedores" [ngValue]="f.id">{{ f.nome }}</option>
-          </select>
+        <div class="form-actions" style="margin-top: 20px;">
+            <button mat-button matStepperPrevious>Voltar</button>
+            <button mat-raised-button color="accent" (click)="salvar()">FINALIZAR CADASTRO</button>
         </div>
-
-        <div class="form-field">
-          <label>Material</label>
-          <select formControlName="idMaterial">
-            <option [ngValue]="null" disabled>Selecione...</option>
-            <option *ngFor="let m of materiais" [ngValue]="m.id">{{ m.nome }}</option>
-          </select>
-        </div>
-      </div>
-   
-      <div class="form-column">
-        <div class="image-upload-card">
-            <label>Capa do Quadrinho</label>
-            <div *ngIf="imagePreview" class="image-preview">
-                <img [src]="imagePreview" alt="Prévia">
-            </div>
-            <input type="file" (change)="onFileSelected($event)" accept="image/*" style="margin-top: 10px;">
-        </div>
-      </div>
-    </div>
-
-    <div class="form-actions">
-      <button (click)="salvar()" [disabled]="formGroup.invalid" class="btn-primary">Salvar</button>
-      <button (click)="excluir()" *ngIf="isEditMode" class="btn-danger">Excluir</button>
-      <a routerLink="/quadrinhos/list" class="btn-secondary">Cancelar</a>
-    </div>
-  </form>
+    </mat-step>
+  </mat-stepper>
 </div>

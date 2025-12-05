@@ -8,11 +8,8 @@ import { ActivatedRoute } from '@angular/router';
 import { CartService } from '../services/cart.service';
 import { Subscription } from 'rxjs';
 
-// >>> IMPORTS DO PAGINATOR
 import { MatPaginatorModule, PageEvent, MatPaginatorIntl } from '@angular/material/paginator';
 import { FormsModule } from '@angular/forms';
-
-// >>> PT-BR para o paginator (arquivo novo logo abaixo)
 import { getPtBrPaginatorIntl } from '../shared/paginator-ptbr';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -21,6 +18,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
+// --- NOVO IMPORT ---
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-quadrinho-list',
@@ -36,12 +35,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatButtonModule,
     MatCardModule,
     MatChipsModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatSnackBarModule // --- ADICIONADO NO IMPORTS ---
   ],
   templateUrl: './quadrinho-list.html',
   styleUrls: ['./quadrinho-list.css'],
   providers: [
-    { provide: MatPaginatorIntl, useFactory: getPtBrPaginatorIntl } // labels em português
+    { provide: MatPaginatorIntl, useFactory: getPtBrPaginatorIntl }
   ]
 })
 export class QuadrinhoListComponent implements OnInit, OnDestroy {
@@ -51,11 +51,10 @@ export class QuadrinhoListComponent implements OnInit, OnDestroy {
   private imageUrls = new Map<number, string>();
   private subscriptions = new Subscription();
 
-  // >>> CONTROLES DE PAGINAÇÃO/PESQUISA
   page = 0;
   pageSize = 12;
-  length = 0;   // será totalRecords ou filteredRecords, conforme q
-  q = '';       // termo de pesquisa
+  length = 0;
+  q = '';
   isPublicView = false;
   cartCount = 0;
 
@@ -63,7 +62,8 @@ export class QuadrinhoListComponent implements OnInit, OnDestroy {
     private quadrinhoService: QuadrinhoService,
     public authService: AuthService,
     private route: ActivatedRoute,
-    private cartService: CartService
+    private cartService: CartService,
+    private snackBar: MatSnackBar // --- INJEÇÃO DO SNACKBAR ---
   ) {}
 
   ngOnInit(): void {
@@ -81,7 +81,6 @@ export class QuadrinhoListComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  // >>> CARREGA USANDO O ENDPOINT /quadrinhos/paged
   load(): void {
     this.quadrinhoService.findPaged(this.page, this.pageSize, this.q).subscribe(res => {
       this.quadrinhos = res.data;
@@ -91,7 +90,7 @@ export class QuadrinhoListComponent implements OnInit, OnDestroy {
   }
 
   pesquisar(): void {
-    this.page = 0;      // sempre voltar para a primeira página ao trocar a busca
+    this.page = 0;
     this.load();
   }
 
@@ -124,6 +123,14 @@ export class QuadrinhoListComponent implements OnInit, OnDestroy {
 
   adicionarAoCarrinho(quadrinho: Quadrinho): void {
     this.cartService.addItem(quadrinho);
+    
+    // --- LÓGICA DO POPUP (SNACKBAR) ---
+    this.snackBar.open(`${quadrinho.nome} adicionado ao carrinho!`, 'Fechar', {
+      duration: 3000, // 3 segundos
+      horizontalPosition: 'center',
+      verticalPosition: 'top', // Aparece no topo
+      panelClass: ['snackbar-success'] // Podemos estilizar se quiser
+    });
   }
 
   private populateImages(quadrinhos: Quadrinho[]): void {

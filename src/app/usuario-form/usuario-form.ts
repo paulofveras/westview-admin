@@ -1,8 +1,13 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { UsuarioService } from '../services/usuario.service';
+
+// Imports do Material para o visual refinado
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 interface UsuarioFormValue {
   id: number | null;
@@ -15,7 +20,14 @@ interface UsuarioFormValue {
   standalone: true,
   templateUrl: './usuario-form.html',
   styleUrl: './usuario-form.css',
-  imports: [CommonModule, ReactiveFormsModule, RouterModule]
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    RouterModule,
+    MatInputModule,
+    MatButtonModule,
+    MatFormFieldModule
+  ]
 })
 export class UsuarioFormComponent implements OnInit {
   formGroup!: FormGroup;

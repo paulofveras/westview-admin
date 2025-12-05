@@ -3,19 +3,28 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AdministradorService } from '../services/administrador.service';
-import { EnderecoService } from '../services/endereco.service'; // Serviço de CEP
+import { EnderecoService } from '../services/endereco.service';
 import { Administrador } from '../models/pessoa.model';
+
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
   selector: 'app-administrador-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, MatStepperModule, MatInputModule, MatButtonModule, MatFormFieldModule],
   templateUrl: './administrador-form.html',
   styleUrl: './administrador-form.css'
 })
 export class AdministradorFormComponent implements OnInit {
-  formGroup!: FormGroup;
+  pessoalForm!: FormGroup;
+  acessoForm!: FormGroup;
+  contatoForm!: FormGroup;
+
   isEditMode: boolean = false;
+  adminId: number | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -26,98 +35,102 @@ export class AdministradorFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const administrador: Administrador = this.route.snapshot.data['administrador'];
-    this.isEditMode = !!(administrador && administrador.id);
-    const username = administrador?.username ?? administrador?.usuario?.username ?? '';
+    // 1. Pessoal
+    this.pessoalForm = this.fb.group({
+      nome: ['', [Validators.required, Validators.minLength(3)]],
+      cpf: ['', [Validators.required, Validators.minLength(11)]],
+      email: ['', [Validators.email]],
+      cargo: ['Administrador', Validators.required],
+      nivelAcesso: ['', Validators.required]
+    });
 
-    this.formGroup = this.fb.group({
-      id: [administrador?.id || null],
-      nome: [administrador?.nome || '', [Validators.required, Validators.minLength(3)]],
-      cpf: [administrador?.cpf || '', [Validators.required, Validators.minLength(11)]],
-      email: [administrador?.email || '', [Validators.email]],
-      cargo: [administrador?.cargo || 'Administrador', Validators.required],
-      nivelAcesso: [administrador?.nivelAcesso || '', Validators.required],
-      username: [username, [Validators.required, Validators.minLength(3)]],
-      senha: [''], // Senha opcional na edição
+    // 2. Acesso
+    this.acessoForm = this.fb.group({
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      senha: ['']
+    });
 
+    // 3. Contato
+    this.contatoForm = this.fb.group({
       endereco: this.fb.group({
-        cep: [administrador?.endereco?.cep || '', [Validators.required, Validators.pattern(/^\d{8}$/)]],
-        rua: [administrador?.endereco?.rua || '', Validators.required],
-        numero: [administrador?.endereco?.numero || '', Validators.required]
+        cep: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
+        rua: ['', Validators.required],
+        numero: ['', Validators.required]
       }),
-
       telefone: this.fb.group({
-        codigoArea: [administrador?.telefone?.codigoArea || '', [Validators.required, Validators.pattern(/^\d{2}$/)]],
-        numero: [administrador?.telefone?.numero || '', Validators.required]
+        codigoArea: ['', [Validators.required, Validators.pattern(/^\d{2}$/)]],
+        numero: ['', Validators.required]
       })
     });
 
-    if (!this.isEditMode) {
-        this.formGroup.get('senha')?.addValidators(Validators.required);
+    const administrador: Administrador = this.route.snapshot.data['administrador'];
+    if (administrador && administrador.id) {
+      this.isEditMode = true;
+      this.adminId = administrador.id;
+      const username = administrador.username ?? administrador.usuario?.username ?? '';
+
+      this.pessoalForm.patchValue({
+        nome: administrador.nome,
+        cpf: administrador.cpf,
+        email: administrador.email,
+        cargo: administrador.cargo,
+        nivelAcesso: administrador.nivelAcesso
+      });
+      this.acessoForm.patchValue({ username: username });
+      this.contatoForm.patchValue({
+        endereco: administrador.endereco,
+        telefone: administrador.telefone
+      });
+    } else {
+       this.acessoForm.get('senha')?.addValidators(Validators.required);
     }
   }
 
   buscarCep() {
-    const cepControl = this.formGroup.get('endereco.cep');
-    const cep = cepControl?.value;
-
+    const enderecoGroup = this.contatoForm.get('endereco') as FormGroup;
+    const cep = enderecoGroup.get('cep')?.value;
     if (cep && String(cep).length === 8) {
-      this.formGroup.get('endereco.rua')?.disable();
-
-      this.enderecoService.consultarCep(cep).subscribe({
-        next: (dados) => {
-          if (!dados.erro) {
-            this.formGroup.get('endereco')?.patchValue({
-              rua: dados.logradouro
-            });
-            document.getElementById('numeroInputAdmin')?.focus();
-          } else {
-            alert('CEP não encontrado.');
-          }
-          this.formGroup.get('endereco.rua')?.enable();
-        },
-        error: () => {
-          alert('Erro ao buscar CEP.');
-          this.formGroup.get('endereco.rua')?.enable();
+      this.enderecoService.consultarCep(cep).subscribe(dados => {
+        if (!dados.erro) {
+            enderecoGroup.patchValue({ rua: dados.logradouro });
         }
       });
     }
   }
 
-salvar() {
-    if (this.formGroup.valid) {
-      this.formGroup.enable();
-      const administrador = this.formGroup.value;
+  salvar() {
+    if (this.pessoalForm.invalid || this.acessoForm.invalid || this.contatoForm.invalid) {
+        this.pessoalForm.markAllAsTouched();
+        this.acessoForm.markAllAsTouched();
+        this.contatoForm.markAllAsTouched();
+        return;
+    }
 
-      if (this.isEditMode) {
-        this.administradorService.update(administrador.id, administrador).subscribe({
+    const administrador = {
+        id: this.adminId,
+        ...this.pessoalForm.value,
+        ...this.acessoForm.value,
+        ...this.contatoForm.value
+    };
+
+    if (this.isEditMode) {
+      this.administradorService.update(administrador.id, administrador).subscribe({
           next: () => this.router.navigateByUrl('/administradores/list'),
-          error: (err: any) => {
-            console.error('Erro ao editar:', err);
-            alert('Erro ao editar administrador.');
-          }
-        });
-      } else {
-        this.administradorService.create(administrador).subscribe({
-          next: () => this.router.navigateByUrl('/administradores/list'),
-          error: (err: any) => {
-            console.error('Erro ao criar:', err);
-            alert('Erro ao criar administrador.');
-          }
-        });
-      }
+          error: (err: any) => alert('Erro ao salvar admin.')
+      });
     } else {
-      this.formGroup.markAllAsTouched();
+      this.administradorService.create(administrador).subscribe({
+          next: () => this.router.navigateByUrl('/administradores/list'),
+          error: (err: any) => alert('Erro ao salvar admin.')
+      });
     }
   }
 
   excluir() {
-    if (this.isEditMode) {
-      const administrador = this.formGroup.value;
-      if (confirm(`Tem certeza que deseja excluir "${administrador.nome}"?`)) {
-        this.administradorService.delete(administrador.id).subscribe({
-          next: () => this.router.navigateByUrl('/administradores/list'),
-          error: (err) => console.error('Erro ao excluir:', err)
+    if (this.isEditMode && this.adminId) {
+      if (confirm('Excluir administrador?')) {
+        this.administradorService.delete(this.adminId).subscribe({
+            next: () => this.router.navigateByUrl('/administradores/list')
         });
       }
     }

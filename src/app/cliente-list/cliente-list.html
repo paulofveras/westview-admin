@@ -1,8 +1,7 @@
 <div class="list-container">
   <header class="list-header">
     <h1>Clientes</h1>
-    <a routerLink="/clientes/new" mat-flat-button color="primary">
-      <mat-icon>person_add</mat-icon>
+    <a routerLink="/clientes/new" class="btn-primary">
       Novo Cliente
     </a>
   </header>
@@ -19,9 +18,8 @@
         <mat-icon>close</mat-icon>
       </button>
     </mat-form-field>
-    <button mat-stroked-button color="primary" (click)="pesquisar()">
-      <mat-icon>search</mat-icon>
-      Buscar
+    <button class="btn-primary" (click)="pesquisar()">
+      Pesquisar
     </button>
   </div>
 
@@ -33,7 +31,7 @@
           <th>CPF</th>
           <th>Usuario</th>
           <th>Email</th>
-          <th class="actions">Acoes</th>
+          <th class="actions">Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -43,12 +41,8 @@
           <td>{{ cliente.username || cliente.usuario?.username }}</td>
           <td>{{ cliente.email }}</td>
           <td class="actions">
-            <a mat-icon-button [routerLink]="['/clientes/edit', cliente.id]" color="primary">
-              <mat-icon>edit</mat-icon>
-            </a>
-            <button mat-icon-button color="warn" (click)="excluir(cliente)">
-              <mat-icon>delete</mat-icon>
-            </button>
+            <a [routerLink]="['/clientes/edit', cliente.id]" class="btn-sm btn-secondary">Editar</a>
+            <button (click)="excluir(cliente)" class="btn-sm btn-danger" style="margin-left: 5px;">Excluir</button>
           </td>
         </tr>
       </tbody>
@@ -67,7 +61,7 @@
 <ng-template #emptyState>
   <div class="empty-state">
     <p>Nenhum cliente encontrado.</p>
-    <a routerLink="/clientes/new" mat-stroked-button color="primary">
+    <a routerLink="/clientes/new" class="btn-primary">
       Cadastrar Cliente
     </a>
   </div>

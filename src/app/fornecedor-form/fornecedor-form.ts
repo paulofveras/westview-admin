@@ -1,111 +1,147 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { FornecedorService } from '../services/fornecedor.service';
-import { EnderecoService } from '../services/endereco.service'; // Novo
-import { Fornecedor } from '../models/pessoa.model';
 import { CommonModule } from '@angular/common';
+
+// Material Imports
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+
+// Services & Models
+import { FornecedorService } from '../services/fornecedor.service';
+import { EnderecoService } from '../services/endereco.service';
+import { Fornecedor } from '../models/pessoa.model';
 
 @Component({
   selector: 'app-fornecedor-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    RouterModule,
+    MatStepperModule, 
+    MatInputModule, 
+    MatButtonModule, 
+    MatFormFieldModule
+  ],
   templateUrl: './fornecedor-form.html',
-  styleUrl: './fornecedor-form.css'
+  styleUrls: ['./fornecedor-form.css']
 })
-export class FornecedorFormComponent implements OnInit { // Adicione 'implements OnInit'
-
-  formGroup!: FormGroup; // Use ! para inicialização tardia
+export class FornecedorFormComponent implements OnInit {
+  // Grupos separados para o Stepper
+  empresaForm!: FormGroup;
+  contatoForm!: FormGroup;
+  
   isEditMode: boolean = false;
+  fornecedorId: number | null = null;
 
-  constructor(private formBuilder: FormBuilder,
-              private fornecedorService: FornecedorService,
-              private enderecoService: EnderecoService, // Injete
-              private router: Router,
-              private activatedRoute: ActivatedRoute) {}
+  constructor(
+    private fb: FormBuilder,
+    private fornecedorService: FornecedorService,
+    private enderecoService: EnderecoService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute
+  ) {}
 
   ngOnInit() {
-    const fornecedor: Fornecedor = this.activatedRoute.snapshot.data['fornecedor'];
-    this.isEditMode = !!(fornecedor && fornecedor.id);
+    // Grupo 1: Dados da Empresa
+    this.empresaForm = this.fb.group({
+      nome: ['', [Validators.required, Validators.minLength(3)]],
+      nomeFantasia: [''],
+      cnpj: ['', [Validators.required, Validators.minLength(14)]],
+      email: ['', [Validators.email]]
+    });
 
-    this.formGroup = this.formBuilder.group({
-      id: [fornecedor?.id || null],
-      nome: [fornecedor?.nome || '', [Validators.required, Validators.minLength(3)]],
-      nomeFantasia: [fornecedor?.nomeFantasia || ''],
-      cnpj: [fornecedor?.cnpj || '', [Validators.required, Validators.minLength(14)]], // Validação simples
-      email: [fornecedor?.email || '', [Validators.email]],
-      
-      endereco: this.formBuilder.group({
-        cep: [fornecedor?.endereco?.cep || '', [Validators.required, Validators.pattern(/^\d{8}$/)]],
-        rua: [fornecedor?.endereco?.rua || '', Validators.required],
-        numero: [fornecedor?.endereco?.numero || '', Validators.required]
+    // Grupo 2: Endereço e Telefone
+    this.contatoForm = this.fb.group({
+      endereco: this.fb.group({
+        cep: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
+        rua: ['', Validators.required],
+        numero: ['', Validators.required]
       }),
-      
-      telefone: this.formBuilder.group({
-        codigoArea: [fornecedor?.telefone?.codigoArea || '', [Validators.required, Validators.pattern(/^\d{2}$/)]],
-        numero: [fornecedor?.telefone?.numero || '', Validators.required]
+      telefone: this.fb.group({
+        codigoArea: ['', [Validators.required, Validators.pattern(/^\d{2}$/)]],
+        numero: ['', Validators.required]
       })
     });
+
+    // Carregar dados se for edição
+    const fornecedor: Fornecedor = this.activatedRoute.snapshot.data['fornecedor'];
+    if (fornecedor && fornecedor.id) {
+      this.isEditMode = true;
+      this.fornecedorId = fornecedor.id;
+
+      this.empresaForm.patchValue({
+        nome: fornecedor.nome,
+        nomeFantasia: fornecedor.nomeFantasia,
+        cnpj: fornecedor.cnpj,
+        email: fornecedor.email
+      });
+
+      this.contatoForm.patchValue({
+        endereco: fornecedor.endereco,
+        telefone: fornecedor.telefone
+      });
+    }
   }
 
-  // --- Lógica de CEP ---
   buscarCep() {
-    const cepControl = this.formGroup.get('endereco.cep');
-    const cep = cepControl?.value;
+    const enderecoGroup = this.contatoForm.get('endereco') as FormGroup;
+    const cep = enderecoGroup.get('cep')?.value;
 
     if (cep && String(cep).length === 8) {
-      this.formGroup.get('endereco.rua')?.disable();
-
+      // Feedback visual (opcional: desabilitar campo rua)
+      
       this.enderecoService.consultarCep(cep).subscribe({
         next: (dados) => {
           if (!dados.erro) {
-            this.formGroup.get('endereco')?.patchValue({
-              rua: dados.logradouro
-            });
+            enderecoGroup.patchValue({ rua: dados.logradouro });
             document.getElementById('numeroInputForn')?.focus();
           } else {
             alert('CEP não encontrado.');
           }
-          this.formGroup.get('endereco.rua')?.enable();
         },
-        error: () => {
-          alert('Erro ao buscar CEP.');
-          this.formGroup.get('endereco.rua')?.enable();
-        }
+        error: () => alert('Erro ao buscar CEP.')
       });
     }
   }
 
   salvar() {
-    if (this.formGroup.valid) {
-      this.formGroup.enable(); // Garante envio de campos desabilitados
-      const fornecedor = this.formGroup.value;
-      
-      const operacao = this.isEditMode
-        ? this.fornecedorService.update(fornecedor)
-        : this.fornecedorService.save(fornecedor);
-
-      operacao.subscribe({
-        next: () => {
-          this.router.navigateByUrl('/fornecedores/list');
-        },
-        error: (err) => {
-          console.log('Erro ao salvar: ' + JSON.stringify(err));
-          alert('Erro ao salvar fornecedor.');
-        }
-      });
-    } else {
-      this.formGroup.markAllAsTouched();
+    // Valida tudo antes de enviar
+    if (this.empresaForm.invalid || this.contatoForm.invalid) {
+      this.empresaForm.markAllAsTouched();
+      this.contatoForm.markAllAsTouched();
+      return;
     }
+
+    // Junta os dados dos dois formulários em um objeto Fornecedor
+    const fornecedor = {
+      id: this.fornecedorId,
+      ...this.empresaForm.value,
+      ...this.contatoForm.value
+    };
+
+    const operacao = this.isEditMode
+      ? this.fornecedorService.update(fornecedor)
+      : this.fornecedorService.save(fornecedor);
+
+    operacao.subscribe({
+      next: () => this.router.navigateByUrl('/fornecedores/list'),
+      error: (err) => {
+        console.log('Erro ao salvar:', err);
+        alert('Erro ao salvar fornecedor.');
+      }
+    });
   }
 
   excluir() {
-    if (this.isEditMode) {
-      const fornecedor = this.formGroup.value;
-      if (confirm(`Tem certeza que deseja excluir "${fornecedor.nome}"?`)) {
-        this.fornecedorService.delete(fornecedor.id).subscribe({
+    if (this.isEditMode && this.fornecedorId) {
+      if (confirm(`Tem certeza que deseja excluir?`)) {
+        this.fornecedorService.delete(this.fornecedorId).subscribe({
           next: () => this.router.navigateByUrl('/fornecedores/list'),
-          error: (err) => console.log('Erro ao Excluir' + JSON.stringify(err))
+          error: (err) => console.log('Erro ao excluir:', err)
         });
       }
     }

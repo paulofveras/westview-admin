@@ -1,27 +1,36 @@
 <div class="form-container">
   <h2>{{ isEdit ? 'Editando Usuário' : 'Novo Usuário' }}</h2>
   
-  <form [formGroup]="formGroup" class="form-grid">
+  <form [formGroup]="formGroup">
+    
     <div class="form-field">
-      <label>Usuário (Login)</label>
-      <input type="text" formControlName="username">
-      <small class="error-msg" *ngIf="formGroup.get('username')?.invalid && formGroup.get('username')?.touched">
-        Mínimo de 3 caracteres.
-      </small>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Usuário (Login)</mat-label>
+        <input matInput formControlName="username" placeholder="Ex: joaosilva">
+        <mat-error *ngIf="formGroup.get('username')?.hasError('required')">
+          Obrigatório
+        </mat-error>
+        <mat-error *ngIf="formGroup.get('username')?.hasError('minlength')">
+          Mínimo de 3 caracteres
+        </mat-error>
+      </mat-form-field>
     </div>
 
     <div class="form-field">
-      <label>Senha <span *ngIf="isEdit" style="font-weight:normal; font-size:0.8em">(deixe em branco para manter)</span></label>
-      <input type="password" formControlName="senha">
-      <small class="error-msg" *ngIf="formGroup.get('senha')?.invalid && formGroup.get('senha')?.touched">
-        Obrigatória na criação.
-      </small>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Senha</mat-label>
+        <input matInput type="password" formControlName="senha" [placeholder]="isEdit ? 'Deixe em branco para manter' : ''">
+        <mat-error *ngIf="formGroup.get('senha')?.hasError('required')">
+          Obrigatória na criação
+        </mat-error>
+      </mat-form-field>
     </div>
 
     <div class="form-actions">
-      <button (click)="salvar()" [disabled]="formGroup.invalid" class="btn-primary">Salvar</button>
-      <button (click)="excluir()" *ngIf="isEdit" class="btn-danger">Excluir</button>
-      <a routerLink="/usuarios/list" class="btn-secondary">Cancelar</a>
+      <button mat-button color="warn" (click)="excluir()" *ngIf="isEdit">Excluir</button>
+      <a routerLink="/usuarios/list" mat-button>Cancelar</a>
+      <button mat-flat-button color="primary" (click)="salvar()">Salvar</button>
     </div>
+
   </form>
 </div>

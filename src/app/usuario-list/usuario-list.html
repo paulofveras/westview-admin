@@ -1,9 +1,8 @@
 <div class="list-container">
   <header class="list-header">
-    <h1>Usuarios</h1>
-    <a routerLink="/usuarios/new" mat-flat-button color="primary">
-      <mat-icon>person_add</mat-icon>
-      Novo Usuario
+    <h1>Usuários</h1>
+    <a routerLink="/usuarios/new" class="btn-primary">
+      Novo Usuário
     </a>
   </header>
 
@@ -19,8 +18,7 @@
         <mat-icon>close</mat-icon>
       </button>
     </mat-form-field>
-    <button mat-stroked-button color="primary" (click)="pesquisar()">
-      <mat-icon>search</mat-icon>
+    <button class="btn-primary" (click)="pesquisar()">
       Buscar
     </button>
   </div>
@@ -30,19 +28,15 @@
       <thead>
         <tr>
           <th>Username</th>
-          <th class="actions">Acoes</th>
+          <th class="actions">Ações</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let usuario of usuarios">
           <td>{{ usuario.username }}</td>
           <td class="actions">
-            <a mat-icon-button [routerLink]="['/usuarios/edit', usuario.id]" color="primary">
-              <mat-icon>edit</mat-icon>
-            </a>
-            <button mat-icon-button color="warn" (click)="excluir(usuario)">
-              <mat-icon>delete</mat-icon>
-            </button>
+            <a [routerLink]="['/usuarios/edit', usuario.id]" class="btn-sm btn-secondary">Editar</a>
+            <button (click)="excluir(usuario)" class="btn-sm btn-danger" style="margin-left: 5px;">Excluir</button>
           </td>
         </tr>
       </tbody>
@@ -60,9 +54,9 @@
 
 <ng-template #emptyState>
   <div class="empty-state">
-    <p>Nenhum usuario encontrado.</p>
-    <a routerLink="/usuarios/new" mat-stroked-button color="primary">
-      Cadastrar Usuario
+    <p>Nenhum usuário encontrado.</p>
+    <a routerLink="/usuarios/new" class="btn-primary">
+      Cadastrar Usuário
     </a>
   </div>
 </ng-template>

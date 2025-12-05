@@ -1,87 +1,87 @@
 <div class="form-container">
   <h2>{{ isEditMode ? 'Editando Fornecedor' : 'Novo Fornecedor' }}</h2>
-  <form [formGroup]="formGroup" class="form-grid">
+
+  <mat-stepper [linear]="false" orientation="vertical" #stepper>
     
-    <div class="form-field">
-      <label>Razão Social:</label>
-      <input type="text" formControlName="nome" placeholder="Razão Social Ltda.">
-      <small class="error-msg" *ngIf="formGroup.get('nome')?.invalid && formGroup.get('nome')?.touched">
-        Obrigatório (min 3 caracteres).
-      </small>
-    </div>
+    <mat-step [stepControl]="empresaForm">
+      <form [formGroup]="empresaForm">
+        <ng-template matStepLabel>Dados da Empresa</ng-template>
+        <div style="margin-top: 20px;"></div>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Razão Social</mat-label>
+          <input matInput formControlName="nome" placeholder="Ex: Panini Comics">
+          <mat-error *ngIf="empresaForm.get('nome')?.hasError('required')">Obrigatório</mat-error>
+        </mat-form-field>
 
-    <div class="form-field">
-      <label>Nome Fantasia:</label>
-      <input type="text" formControlName="nomeFantasia" placeholder="Nome comercial">
-    </div>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nome Fantasia</mat-label>
+          <input matInput formControlName="nomeFantasia">
+        </mat-form-field>
 
-    <div class="form-field">
-      <label>CNPJ:</label>
-      <input type="text" formControlName="cnpj" placeholder="Apenas números (14 dígitos)" maxlength="14">
-      <small class="error-msg" *ngIf="formGroup.get('cnpj')?.invalid && formGroup.get('cnpj')?.touched">
-        Deve conter 14 dígitos.
-      </small>
-    </div>
+        <div class="row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>CNPJ</mat-label>
+            <input matInput formControlName="cnpj" placeholder="Apenas números">
+            <mat-error>CNPJ inválido</mat-error>
+          </mat-form-field>
 
-    <div class="form-field">
-      <label>Email:</label>
-      <input type="email" formControlName="email" placeholder="contato@empresa.com">
-      <small class="error-msg" *ngIf="formGroup.get('email')?.invalid && formGroup.get('email')?.touched">
-        Email inválido.
-      </small>
-    </div>
-
-    <fieldset formGroupName="endereco" class="fieldset-group">
-      <legend>Endereço</legend>
-      <div class="form-row">
-        <div class="form-field small-field">
-          <label>CEP:</label>
-          <input type="text" formControlName="cep" placeholder="00000000" maxlength="8" (blur)="buscarCep()">
-          <small class="error-msg" *ngIf="formGroup.get('endereco.cep')?.invalid && formGroup.get('endereco.cep')?.touched">
-            Exatamente 8 dígitos.
-          </small>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" placeholder="contato@empresa.com">
+            <mat-error>Email inválido</mat-error>
+          </mat-form-field>
         </div>
-        <div class="form-field full-width">
-          <label>Rua:</label>
-          <input type="text" formControlName="rua" placeholder="Rua preenchida automaticamente...">
-          <small class="error-msg" *ngIf="formGroup.get('endereco.rua')?.invalid && formGroup.get('endereco.rua')?.touched">
-            Obrigatório.
-          </small>
-        </div>
-        <div class="form-field small-field">
-          <label>Número:</label>
-          <input type="number" id="numeroInputForn" formControlName="numero">
-          <small class="error-msg" *ngIf="formGroup.get('endereco.numero')?.invalid && formGroup.get('endereco.numero')?.touched">
-            Obrig.
-          </small>
-        </div>
-      </div>
-    </fieldset>
 
-    <fieldset formGroupName="telefone" class="fieldset-group">
-      <legend>Telefone</legend>
-      <div class="form-row">
-        <div class="form-field small-field">
-          <label>DDD:</label>
-          <input type="text" formControlName="codigoArea" placeholder="XX" maxlength="2">
-          <small class="error-msg" *ngIf="formGroup.get('telefone.codigoArea')?.invalid && formGroup.get('telefone.codigoArea')?.touched">
-            2 dígitos.
-          </small>
+        <div class="form-actions">
+          <button mat-button color="warn" *ngIf="isEditMode" (click)="excluir()">Excluir</button>
+          <button mat-flat-button color="primary" matStepperNext>Próximo</button>
         </div>
-        <div class="form-field full-width">
-          <label>Número:</label>
-          <input type="text" formControlName="numero" placeholder="9XXXX-XXXX">
-          <small class="error-msg" *ngIf="formGroup.get('telefone.numero')?.invalid && formGroup.get('telefone.numero')?.touched">
-            Mínimo 8 dígitos.
-          </small>
-        </div>
-      </div>
-    </fieldset>
+      </form>
+    </mat-step>
 
-    <div class="form-actions">
-      <button (click)="salvar()" [disabled]="formGroup.invalid" class="btn-primary">Salvar</button>
-      <button (click)="excluir()" *ngIf="isEditMode" class="btn-danger">Excluir</button>
-      <a routerLink="/fornecedores/list" class="btn-secondary">Cancelar</a>
-    </div>
-  </form>
+    <mat-step [stepControl]="contatoForm">
+      <form [formGroup]="contatoForm">
+        <ng-template matStepLabel>Localização e Contato</ng-template>
+        <div style="margin-top: 20px;"></div>
+
+        <div formGroupName="endereco">
+          <div class="row">
+            <mat-form-field appearance="outline" style="width: 120px;">
+              <mat-label>CEP</mat-label>
+              <input matInput formControlName="cep" (blur)="buscarCep()" maxlength="8">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" style="flex: 1;">
+              <mat-label>Rua</mat-label>
+              <input matInput formControlName="rua">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" style="width: 100px;">
+              <mat-label>Nº</mat-label>
+              <input matInput id="numeroInputForn" formControlName="numero">
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div formGroupName="telefone" class="row">
+            <mat-form-field appearance="outline" style="width: 90px;">
+              <mat-label>DDD</mat-label>
+              <input matInput formControlName="codigoArea" maxlength="2">
+            </mat-form-field>
+  
+            <mat-form-field appearance="outline" style="flex: 1;">
+              <mat-label>Número</mat-label>
+              <input matInput formControlName="numero">
+            </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button matStepperPrevious>Voltar</button>
+          <button mat-raised-button color="accent" (click)="salvar()">SALVAR FORNECEDOR</button>
+        </div>
+      </form>
+    </mat-step>
+
+  </mat-stepper>
 </div>

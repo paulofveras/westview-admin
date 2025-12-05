@@ -1,106 +1,108 @@
 <div class="cadastro-container">
   <div class="cadastro-card">
     <h2>Crie sua conta</h2>
-    <p class="subtitle">Junte-se à Westview Comics</p>
-
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    
+    <mat-stepper [linear]="true" #stepper>
       
-      <div class="section-title">Dados Pessoais</div>
-      
-      <div class="form-row">
-        <div class="form-group full-width">
-          <label>Nome Completo</label>
-          <input type="text" formControlName="nome" placeholder="Ex: Wanda Maximoff">
-          <small class="error-msg" *ngIf="form.get('nome')?.invalid && form.get('nome')?.touched">
-            Mínimo de 4 caracteres.
-          </small>
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group full-width">
-          <label>CPF</label>
-          <input type="text" formControlName="cpf" placeholder="Apenas números (11 dígitos)" maxlength="11">
-          <small class="error-msg" *ngIf="form.get('cpf')?.invalid && form.get('cpf')?.touched">
-            Digite os 11 números do CPF.
-          </small>
-        </div>
-      </div>
+      <mat-step [stepControl]="pessoalForm">
+        <form [formGroup]="pessoalForm">
+          <ng-template matStepLabel>Dados Pessoais</ng-template>
+          
+          <div class="form-field">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Nome Completo</mat-label>
+              <input matInput formControlName="nome" placeholder="Ex: Wanda Maximoff">
+              <mat-error *ngIf="pessoalForm.get('nome')?.hasError('required')">Obrigatório</mat-error>
+            </mat-form-field>
+          </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" formControlName="email" placeholder="email@exemplo.com">
-          <small class="error-msg" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
-            Formato: exemplo@mail.com
-          </small>
-        </div>
-        <div class="form-group">
-          <label>Usuário (Login)</label>
-          <input type="text" formControlName="username">
-          <small class="error-msg" *ngIf="form.get('username')?.invalid && form.get('username')?.touched">
-            Obrigatório.
-          </small>
-        </div>
-      </div>
+          <div class="form-field">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>CPF</mat-label>
+              <input matInput formControlName="cpf" placeholder="Apenas números">
+              <mat-error>CPF inválido (11 dígitos)</mat-error>
+            </mat-form-field>
+          </div>
 
-      <div class="form-group">
-        <label>Senha</label>
-        <input type="password" formControlName="senha">
-        <small class="error-msg" *ngIf="form.get('senha')?.invalid && form.get('senha')?.touched">
-          Mínimo 3 caracteres.
-        </small>
-      </div>
+          <div class="form-field">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email</mat-label>
+              <input matInput formControlName="email" placeholder="email@exemplo.com">
+              <mat-error>Email inválido</mat-error>
+            </mat-form-field>
+          </div>
 
-      <div class="section-title">Telefone</div>
-      <div class="form-row" formGroupName="telefone">
-        <div class="form-group small">
-          <label>DDD</label>
-          <input type="text" formControlName="codigoArea" placeholder="XX" maxlength="2">
-          <small class="error-msg" *ngIf="form.get('telefone.codigoArea')?.invalid && form.get('telefone.codigoArea')?.touched">
-            (XX)
-          </small>
-        </div>
-        <div class="form-group">
-          <label>Número</label>
-          <input type="text" formControlName="numero" placeholder="9XXXX-XXXX" maxlength="9">
-          <small class="error-msg" *ngIf="form.get('telefone.numero')?.invalid && form.get('telefone.numero')?.touched">
-            9XXXX-XXXX
-          </small>
-        </div>
-      </div>
+          <div class="step-actions">
+            <button mat-flat-button color="primary" matStepperNext>Próximo</button>
+          </div>
+        </form>
+      </mat-step>
 
-      <div class="section-title">Endereço</div>
-      <div class="form-row" formGroupName="endereco">
-        <div class="form-group small-cep">
-          <label>CEP</label>
-          <input type="text" formControlName="cep" placeholder="XXXXXXXX" maxlength="8" (blur)="buscarCep()">
-          <small class="error-msg" *ngIf="form.get('endereco.cep')?.invalid && form.get('endereco.cep')?.touched">
-            XXXXXXXX (8 n°)
-          </small>
-        </div>
-        <div class="form-group full-width">
-          <label>Rua</label>
-          <input type="text" formControlName="rua" placeholder="Rua preenchida automaticamente...">
-          <small class="error-msg" *ngIf="form.get('endereco.rua')?.invalid && form.get('endereco.rua')?.touched">
-            Obrigatório.
-          </small>
-        </div>
-        <div class="form-group small">
-          <label>Nº</label>
-          <input type="number" id="numeroInput" formControlName="numero">
-          <small class="error-msg" *ngIf="form.get('endereco.numero')?.invalid && form.get('endereco.numero')?.touched">
-            Obrig.
-          </small>
-        </div>
-      </div>
+      <mat-step [stepControl]="contatoForm">
+        <form [formGroup]="contatoForm">
+          <ng-template matStepLabel>Contato e Endereço</ng-template>
+          
+          <div formGroupName="telefone" class="row">
+            <mat-form-field appearance="outline" style="width: 30%">
+              <mat-label>DDD</mat-label>
+              <input matInput formControlName="codigoArea">
+            </mat-form-field>
+            <mat-form-field appearance="outline" style="width: 68%">
+              <mat-label>Número</mat-label>
+              <input matInput formControlName="numero">
+            </mat-form-field>
+          </div>
 
-      <div class="actions">
-        <button type="submit" class="btn-primary" [disabled]="form.invalid || isLoading">
-          {{ isLoading ? 'Salvando...' : 'Cadastrar' }}
-        </button>
-        <a routerLink="/login" class="link-login">Já tem conta? Faça login</a>
-      </div>
-    </form>
+          <div formGroupName="endereco">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>CEP</mat-label>
+              <input matInput formControlName="cep" (blur)="buscarCep()" maxlength="8">
+            </mat-form-field>
+
+            <div class="row">
+              <mat-form-field appearance="outline" style="width: 70%">
+                <mat-label>Rua</mat-label>
+                <input matInput formControlName="rua">
+              </mat-form-field>
+              <mat-form-field appearance="outline" style="width: 28%">
+                <mat-label>Nº</mat-label>
+                <input matInput id="numeroInput" formControlName="numero">
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button mat-button matStepperPrevious>Voltar</button>
+            <button mat-flat-button color="primary" matStepperNext>Próximo</button>
+          </div>
+        </form>
+      </mat-step>
+
+      <mat-step [stepControl]="acessoForm">
+        <form [formGroup]="acessoForm">
+          <ng-template matStepLabel>Login</ng-template>
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nome de Usuário</mat-label>
+            <input matInput formControlName="username">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Senha</mat-label>
+            <input matInput type="password" formControlName="senha">
+          </mat-form-field>
+
+          <div class="step-actions">
+            <button mat-button matStepperPrevious>Voltar</button>
+            <button mat-flat-button color="accent" (click)="onSubmit()">Finalizar Cadastro</button>
+          </div>
+        </form>
+      </mat-step>
+
+    </mat-stepper>
+    
+    <div style="text-align: center; margin-top: 15px;">
+        <a routerLink="/login" class="link-login">Já tem conta? Entrar</a>
+    </div>
   </div>
 </div>
