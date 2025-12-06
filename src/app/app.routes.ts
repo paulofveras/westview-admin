@@ -22,6 +22,7 @@ import { PerfilComponent } from './perfil/perfil.component';
 import { CadastroComponent } from './cadastro/cadastro.component';
 import { MeusPedidosComponent } from './meus-pedidos/meus-pedidos.component';
 import { QuadrinhoAdminListComponent } from './quadrinho-admin-list/quadrinho-admin-list';
+import { PedidoListComponent } from './pedido-list/pedido-list'; 
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -45,6 +46,13 @@ export const routes: Routes = [
     component: QuadrinhoFormComponent,
     resolve: { quadrinho: quadrinhoResolver },
     canActivate: [authGuard]
+  },
+
+  {
+    path: 'pedidos/list',
+    component: PedidoListComponent,
+    canActivate: [authGuard],
+    data: { roles: ['Funcionario', 'Administrador'] }
   },
 
   { path: 'fornecedores/list', component: FornecedorListComponent, canActivate: [authGuard] },

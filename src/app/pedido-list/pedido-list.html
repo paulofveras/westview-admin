@@ -1,0 +1,64 @@
+<div class="list-container">
+  <header class="list-header">
+    <h1>Gestão de Pedidos</h1>
+    <p>Visualize todos os pedidos realizados na loja.</p>
+  </header>
+
+  <div class="table-wrapper">
+    <table mat-table [dataSource]="pedidos">
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let p"> #{{ p.id }} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="data">
+        <th mat-header-cell *matHeaderCellDef> Data </th>
+        <td mat-cell *matCellDef="let p"> 
+           {{ getDataFormatada(p.data) | date:'dd/MM/yyyy HH:mm' }} 
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="cliente">
+        <th mat-header-cell *matHeaderCellDef> Cliente </th>
+        <td mat-cell *matCellDef="let p"> 
+          <span style="font-weight: 500;">{{ p.cliente?.nome }}</span>
+          <br>
+          <small style="color: #666;">{{ p.cliente?.cpf }}</small>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="total">
+        <th mat-header-cell *matHeaderCellDef> Total </th>
+        <td mat-cell *matCellDef="let p" style="font-weight: bold; color: #2c3e50;"> 
+          {{ p.total | currency:'BRL' }} 
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef> Status </th>
+        <td mat-cell *matCellDef="let p">
+          <mat-chip [color]="p.statusPagamento?.id === 1 ? 'accent' : 'warn'" selected>
+            {{ p.statusPagamento?.nome }}
+          </mat-chip>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="acoes">
+        <th mat-header-cell *matHeaderCellDef> Ações </th>
+        <td mat-cell *matCellDef="let p">
+          <button mat-icon-button color="primary" (click)="verDetalhes(p)" matTooltip="Ver Detalhes do Pedido">
+            <mat-icon>visibility</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+    
+    <div *ngIf="pedidos.length === 0" class="empty-state">
+        Nenhum pedido encontrado.
+    </div>
+  </div>
+</div>

@@ -4,13 +4,16 @@
   </a>
 
   <nav>
-    <ng-container *ngIf="isAdminView() && authService.isFuncionario(); else storeNav">
+<ng-container *ngIf="isAdminView() && authService.isLoggedIn() && authService.isFuncionario(); else storeNav">
       <ul>
         <li><a routerLink="/quadrinhos/list" routerLinkActive="active" class="nav-link">Quadrinhos</a></li>
+        
+        <li><a routerLink="/pedidos/list" routerLinkActive="active" class="nav-link">Pedidos</a></li>
+        
         <li><a routerLink="/fornecedores/list" routerLinkActive="active" class="nav-link">Fornecedores</a></li>
         <li><a routerLink="/clientes/list" routerLinkActive="active" class="nav-link">Clientes</a></li>
         <li *ngIf="authService.hasRole('Administrador')">
-          <a routerLink="/usuarios/list" routerLinkActive="active" class="nav-link">Usuários</a>
+          <a routerLink="/usuarios/list" routerLinkActive="active" class="nav-link">Usuarios</a>
         </li>
         <li *ngIf="authService.hasRole('Administrador')">
           <a routerLink="/administradores/list" routerLinkActive="active" class="nav-link">Administradores</a>

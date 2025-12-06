@@ -26,8 +26,12 @@ export class PedidoService {
     return this.http.post<any>(this.baseURL, pedido);
   }
 
-  // --- O MÉTODO QUE ESTAVA FALTANDO ---
   meusPedidos(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseURL}/search/meus-Pedidos`);
+  }
+
+  // --- NOVO MÉTODO ---
+  findAll(): Observable<any[]> {
+    return this.http.get<any[]>(this.baseURL);
   }
 }

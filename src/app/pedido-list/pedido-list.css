@@ -1,0 +1,49 @@
+.list-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.list-header {
+  margin-bottom: 20px;
+}
+
+.list-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #333;
+}
+
+.list-header p {
+  color: #666;
+  margin-top: 5px;
+}
+
+.table-wrapper {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+table {
+  width: 100%;
+}
+
+th.mat-header-cell {
+  background: #f8f9fa;
+  font-weight: 700;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+tr.mat-row:hover {
+  background-color: #fcfcfc;
+}
+
+.empty-state {
+    padding: 40px;
+    text-align: center;
+    color: #888;
+    font-style: italic;
+}

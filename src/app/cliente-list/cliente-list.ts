@@ -66,15 +66,21 @@ export class ClienteListComponent implements OnInit {
     this.load();
   }
 
-  excluir(cliente: Cliente): void {
-    if (!cliente.id) {
-      return;
-    }
+excluir(cliente: Cliente): void {
+    if (!cliente.id) return;
 
     if (confirm(`Deseja realmente excluir o cliente "${cliente.nome}"?`)) {
       this.clienteService.delete(cliente.id).subscribe({
-        next: () => this.load(),
-        error: (error) => console.error('Erro ao excluir cliente', error)
+        next: () => {
+          this.load();
+          // Opcional: Mostrar sucesso
+        },
+        error: (err) => {
+          console.error('Erro:', err);
+          // Verifica se o backend mandou uma mensagem de validação
+          const mensagem = err.error?.errors?.[0]?.message || 'Erro ao excluir cliente. Verifique se existem pedidos associados a ele e tente novamente.';
+          alert(mensagem);
+        }
       });
     }
   }
