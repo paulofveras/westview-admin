@@ -4,9 +4,29 @@
     <p>Visualize todos os pedidos realizados na loja.</p>
   </header>
 
+  <div class="filters-row">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Buscar</mat-label>
+      <input matInput [(ngModel)]="q" (keyup.enter)="pesquisar()" placeholder="ID, Nome ou CPF...">
+      <button mat-icon-button matSuffix (click)="pesquisar()">
+        <mat-icon>search</mat-icon>
+      </button>
+      <button *ngIf="q" mat-icon-button matSuffix (click)="q=''; pesquisar()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <div class="sort-control">
+      <span class="sort-label">Ordenar por:</span>
+      <mat-button-toggle-group [(ngModel)]="sortOrder" (change)="mudarOrdem()" aria-label="Ordenação">
+        <mat-button-toggle value="desc">Mais Recentes</mat-button-toggle>
+        <mat-button-toggle value="asc">Mais Antigos</mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+  </div>
+
   <div class="table-wrapper">
     <table mat-table [dataSource]="pedidos">
-
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef> ID </th>
         <td mat-cell *matCellDef="let p"> #{{ p.id }} </td>
@@ -15,7 +35,7 @@
       <ng-container matColumnDef="data">
         <th mat-header-cell *matHeaderCellDef> Data </th>
         <td mat-cell *matCellDef="let p"> 
-           {{ getDataFormatada(p.data) | date:'dd/MM/yyyy HH:mm' }} 
+           <span *ngIf="getDataFormatada(p.data)">{{ getDataFormatada(p.data) | date:'dd/MM/yyyy HH:mm' }}</span>
         </td>
       </ng-container>
 
@@ -47,7 +67,7 @@
       <ng-container matColumnDef="acoes">
         <th mat-header-cell *matHeaderCellDef> Ações </th>
         <td mat-cell *matCellDef="let p">
-          <button mat-icon-button color="primary" (click)="verDetalhes(p)" matTooltip="Ver Detalhes do Pedido">
+          <button mat-icon-button color="primary" (click)="verDetalhes(p)" matTooltip="Ver Detalhes">
             <mat-icon>visibility</mat-icon>
           </button>
         </td>
@@ -60,5 +80,13 @@
     <div *ngIf="pedidos.length === 0" class="empty-state">
         Nenhum pedido encontrado.
     </div>
+
+    <mat-paginator 
+      [length]="length"
+      [pageSize]="pageSize"
+      [pageIndex]="page"
+      [pageSizeOptions]="[5, 10, 20]"
+      (page)="paginar($event)">
+    </mat-paginator>
   </div>
 </div>

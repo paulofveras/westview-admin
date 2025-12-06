@@ -129,9 +129,9 @@ export class CarrinhoComponent implements OnInit, OnDestroy {
   }
 
   iniciarTimerPix() {
-    this.tempoPixRestante = 10; // 10s para o professor ver
+    this.tempoPixRestante = 15; // 15s para o professor ver
     this.statusPix = 'Aguardando confirmação do banco...';
-    this.displayTempoPix = '00:10';
+    this.displayTempoPix = '00:15';
     
     this.pixInterval = setInterval(() => {
       this.tempoPixRestante--;
@@ -166,7 +166,7 @@ export class CarrinhoComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Flag 'automatico' para pular validações de botão manual
+ // Flag 'automatico' para pular validações de botão manual
   finalizarCompra(automatico = false): void {
     if (!this.authService.isLoggedIn()) {
       alert('Faça login para continuar.');
@@ -190,8 +190,12 @@ export class CarrinhoComponent implements OnInit, OnDestroy {
 
     const pedidoDTO: PedidoDTO = {
       idCliente: usuario.id,
-      // Se for "Exemplo" (4), manda como Pix (1) pro backend não reclamar
-      idPagamento: this.idPagamentoSelecionado === 4 ? 1 : this.idPagamentoSelecionado,
+      
+      // --- CORREÇÃO AQUI ---
+      // Agora enviamos o ID real selecionado (inclusive o 4 - Exemplo)
+      idPagamento: this.idPagamentoSelecionado, 
+      // ---------------------
+
       itens: this.items.map(item => ({
         quantidade: item.quantity,
         desconto: 0.0,
