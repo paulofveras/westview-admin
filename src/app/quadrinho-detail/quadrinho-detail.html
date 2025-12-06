@@ -1,0 +1,61 @@
+<div class="detail-container" *ngIf="quadrinho">
+  
+  <div class="product-hero">
+    <div class="image-wrapper">
+      <img [src]="getUrlImagem(quadrinho.nomeImagem)" alt="{{ quadrinho.nome }}">
+    </div>
+    
+    <div class="info-wrapper">
+      <div class="breadcrumb">
+        Loja / {{ quadrinho.material?.nome }} / {{ quadrinho.nome }}
+      </div>
+
+      <h1 class="title">{{ quadrinho.nome }}</h1>
+      <h3 class="author">Fornecido por: {{ quadrinho.fornecedor?.nome }}</h3>
+      
+      <div class="meta-tags">
+        <mat-chip-set>
+          <mat-chip color="primary" highlighted>{{ quadrinho.material?.nome }}</mat-chip>
+          <mat-chip>{{ quadrinho.quantPaginas }} páginas</mat-chip>
+          <mat-chip [class.low-stock]="quadrinho.estoque < 10">
+             {{ quadrinho.estoque }} em estoque
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+
+      <div class="description-box">
+        <h3>Sobre este quadrinho</h3>
+        <p>{{ quadrinho.descricao }}</p>
+      </div>
+
+      <div class="purchase-card">
+        <div class="price-tag">
+          <span class="currency">R$</span>
+          <span class="value">{{ quadrinho.preco | number:'1.2-2' }}</span>
+        </div>
+        
+        <button mat-flat-button color="primary" class="btn-add-cart" (click)="adicionarAoCarrinho()">
+          <mat-icon>add_shopping_cart</mat-icon>
+          Adicionar à Sacola
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <mat-divider class="section-divider"></mat-divider>
+
+  <div class="recommendations" *ngIf="recomendados.length > 0">
+    <h2>Você também pode gostar</h2>
+    <div class="rec-grid">
+      <div class="rec-card" *ngFor="let rec of recomendados" [routerLink]="['/produto', rec.id]">
+        <img [src]="getUrlImagem(rec.nomeImagem)" alt="{{ rec.nome }}">
+        <div class="rec-info">
+          <h4>{{ rec.nome }}</h4>
+          <span class="rec-price">{{ rec.preco | currency:'BRL' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

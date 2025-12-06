@@ -195,18 +195,28 @@
 
 .catalog-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
+  /* MUDANÇA: auto-fill mantém as colunas fantasmas, impedindo que um único item estique
+     Aumentei um pouco o minmax para 280px para caber melhor as informações */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
 }
 
+/* Adicione isso para garantir que o card não cresça demais verticalmente */
 .product-card {
   border-radius: 20px;
   overflow: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  height: 100%; /* Ocupa a altura, mas não força largura */
+  max-width: 400px; /* Trava de segurança para não ficar gigante em telas wide */
+  margin: 0 auto; /* Centraliza se estiver sozinho na coluna */
   box-shadow: var(--shadow-elevated);
+  transition: transform 0.2s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
 }
 
 .product-card mat-card-header {

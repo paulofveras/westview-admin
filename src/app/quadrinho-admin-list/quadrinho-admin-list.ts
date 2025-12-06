@@ -67,7 +67,14 @@ export class QuadrinhoAdminListComponent implements OnInit {
 
   excluir(quadrinho: Quadrinho): void {
     if (confirm(`Deseja excluir "${quadrinho.nome}" do sistema?`)) {
-      this.quadrinhoService.delete(quadrinho).subscribe(() => this.load());
+      this.quadrinhoService.delete(quadrinho).subscribe({
+        next: () => this.load(),
+        // Tratamento de erro amigável
+        error: (err) => {
+            const msg = err.error?.errors?.[0]?.message || 'Erro ao excluir quadrinho. Verifique dependências.';
+            alert(msg);
+        }
+      });
     }
   }
 
