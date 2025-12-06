@@ -235,6 +235,28 @@
   overflow: hidden;
 }
 
+/* Estilo do botão de favorito */
+.favorite-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  transition: background 0.2s, transform 0.2s;
+  z-index: 2; /* Garante que fique acima da imagem */
+}
+
+.favorite-btn:hover {
+  background: #fff;
+  transform: scale(1.1);
+}
+
+/* Se estiver favoritado (ícone cheio), destaca mais */
+.favorite-btn[color="warn"] {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
 .card-media img {
   width: 100%;
   height: 100%;

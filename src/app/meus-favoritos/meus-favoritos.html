@@ -1,0 +1,30 @@
+<div class="fav-container">
+  <header class="fav-header">
+    <h1>Meus Favoritos</h1>
+    <p>Sua coleção de desejos.</p>
+  </header>
+
+  <div *ngIf="loading" class="loading">Carregando...</div>
+
+  <div class="fav-grid" *ngIf="!loading && favoritos.length > 0">
+    <mat-card *ngFor="let hq of favoritos" class="fav-card">
+      <img mat-card-image [src]="getImageSrc(hq)" alt="{{ hq.nome }}">
+      <mat-card-content>
+        <h3>{{ hq.nome }}</h3>
+        <p class="price">{{ hq.preco | currency:'BRL' }}</p>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <a mat-button color="primary" [routerLink]="['/produto', hq.id]">Ver</a>
+        <button mat-icon-button color="warn" (click)="remover(hq)" matTooltip="Remover dos favoritos">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <div *ngIf="!loading && favoritos.length === 0" class="empty-state">
+    <mat-icon>favorite_border</mat-icon>
+    <h3>Você ainda não tem favoritos.</h3>
+    <a routerLink="/loja" mat-raised-button color="primary">Ir para a Loja</a>
+  </div>
+</div>

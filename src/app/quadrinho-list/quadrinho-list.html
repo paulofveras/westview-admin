@@ -77,6 +77,12 @@
                     <span class="stock-badge" [ngClass]="{ 'low': quadrinho.estoque < 10 }">
                         {{ quadrinho.estoque > 0 ? (quadrinho.estoque + ' em estoque') : 'Indisponível' }}
                     </span>
+                    
+                    <button *ngIf="isPublicView" mat-icon-button class="favorite-btn" (click)="toggleFavorito(quadrinho)" 
+                            [color]="isFavorito(quadrinho) ? 'warn' : ''" 
+                            matTooltip="Adicionar aos favoritos">
+                        <mat-icon>{{ isFavorito(quadrinho) ? 'favorite' : 'favorite_border' }}</mat-icon>
+                    </button>
                 </div>
                 <mat-card-header>
                     <div mat-card-avatar class="avatar">

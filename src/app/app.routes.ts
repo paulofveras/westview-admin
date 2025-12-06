@@ -24,6 +24,7 @@ import { MeusPedidosComponent } from './meus-pedidos/meus-pedidos.component';
 import { QuadrinhoAdminListComponent } from './quadrinho-admin-list/quadrinho-admin-list';
 import { PedidoListComponent } from './pedido-list/pedido-list';
 import { QuadrinhoDetailComponent } from './quadrinho-detail/quadrinho-detail';
+import { MeusFavoritosComponent } from './meus-favoritos/meus-favoritos';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -33,6 +34,7 @@ export const routes: Routes = [
   { path: 'loja', component: QuadrinhoListComponent, data: { publicView: true } },
   { path: 'carrinho', component: CarrinhoComponent },
   { path: 'produto/:id', component: QuadrinhoDetailComponent },
+  { path: 'meus-favoritos', component: MeusFavoritosComponent, canActivate: [authGuard] },
   { path: 'meus-pedidos', component: MeusPedidosComponent, canActivate: [authGuard] },
   { path: 'dashboard', component: AdminDashboardComponent, canActivate: [authGuard] },
 

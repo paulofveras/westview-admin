@@ -32,6 +32,10 @@
           <a routerLink="/meus-pedidos" routerLinkActive="active" class="nav-link">Meus Pedidos</a>
         </li>
 
+        <li *ngIf="authService.isLoggedIn() && !authService.isFuncionario()">
+          <a routerLink="/meus-favoritos" routerLinkActive="active" class="nav-link">Favoritos</a>
+        </li>
+
         <li *ngIf="!authService.isFuncionario()">
           <a routerLink="/carrinho" routerLinkActive="active" class="nav-link cart-link">
             Carrinho

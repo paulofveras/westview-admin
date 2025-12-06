@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { Cliente } from '../models/pessoa.model';
 import { PageResult } from '../models/page-result.model';
+import { Quadrinho } from '../models/quadrinho.model'; 
 
 interface ClienteDto {
   nome: string;
@@ -76,6 +77,20 @@ export class ClienteService {
     return this.http.patch<void>(`${this.baseURL}/update-username/${id}`, {
       newUsername
     });
+  }
+
+  // --- NOVOS MÉTODOS DE FAVORITOS ---
+
+  adicionarFavorito(idCliente: number, idQuadrinho: number): Observable<void> {
+    return this.http.post<void>(`${this.baseURL}/${idCliente}/favoritos/${idQuadrinho}`, {});
+  }
+
+  removerFavorito(idCliente: number, idQuadrinho: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseURL}/${idCliente}/favoritos/${idQuadrinho}`);
+  }
+
+  getFavoritos(idCliente: number): Observable<Quadrinho[]> {
+    return this.http.get<Quadrinho[]>(`${this.baseURL}/${idCliente}/favoritos`);
   }
 
   private normalizeCliente(cliente: Cliente): Cliente {
